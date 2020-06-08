@@ -70,7 +70,7 @@
         var Stroke = ol.style.Stroke;
         var Style = ol.style.Style;
         var Text = ol.style.Text;
-
+        var Icon = ol.style.Icon
 
 
         //import {Draw, Modify, Select, Snap} from 'ol/interaction.js';
@@ -264,6 +264,13 @@
         };
 
         ExampleModify.init();
+ExampleModify.modify.on('modifyend', function(evt){
+    var collection = evt.features;
+
+    collection.forEach(function(feature){
+        feature.setStyle(styleFunction);
+    });
+});
 
         var optionsForm = document.getElementById('options-form');
 
@@ -272,6 +279,7 @@
                 map.addInteraction(this.Point);
                 this.Point.setActive(false);
                 map.addInteraction(this.LineString);
+
                 this.LineString.setActive(false);
                 map.addInteraction(this.Polygon);
                 this.Polygon.setActive(false);
@@ -312,7 +320,9 @@
         };
         ExampleDraw.init();
 
-
+        ExampleDraw.LineString.on('drawend', function(evt){
+    var collection = evt.feature.setStyle(styleFunction);
+});
         /**
          * Let user change the geometry type.
          * @param {Event} e Change event.
