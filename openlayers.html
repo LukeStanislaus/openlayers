@@ -9,7 +9,7 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/build/ol.js"></script>
-    <title>OpenLayers example</title>
+    <title>OpenLayers Modify</title>
 </head>
 <body>
     <form id="options-form" automplete="off">
@@ -39,6 +39,11 @@
     </form>
     <script>
 
+
+
+
+
+
         //import Feature from 'ol/Feature.js';
         var Feature = ol.Feature;
         //import Map from 'ol/Map.js';
@@ -62,11 +67,10 @@
         var Circle = ol.style.Circle;
         var CircleStyle = ol.style.Circle;
         var Fill = ol.style.Fill;
-        var Icon = ol.style.Icon;
         var Stroke = ol.style.Stroke;
         var Style = ol.style.Style;
         var Text = ol.style.Text;
-
+        var Icon = ol.style.Icon
 
 
         //import {Draw, Modify, Select, Snap} from 'ol/interaction.js';
@@ -108,18 +112,16 @@
 
         var route = new ol.geom.LineString(locations)
             .transform('EPSG:4326', 'EPSG:3857');
+
         var routeCoords = route.getCoordinates();
 
 
-        //document.getElementById("Var1").innerHTML = routeCoords[0];
-        //document.getElementById("Var2").innerHTML = center;
 
         var count = locations1.length;
         var Markfeatures = new Array(count);
         //var e = 4500000;
         for (var i = 0; i < count; ++i) {
-            //var coordinates = [2 * e * Math.random() - e, 2 * e * Math.random() - e];
-            Markfeatures[i] = new Feature({geometry: new Point(routeCoords[i]), name: locations1[i][2]});
+            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations1[i][2] });
         }
 
         var source = new VectorSource({
@@ -128,6 +130,8 @@
 
 
         var styleCache = {};
+
+        //Marks Layer
         var Marks = new VectorLayer({
             source: source,
             style: function (feature) {
@@ -157,19 +161,20 @@
             }
         });
 
+        //Map Image Layer
         var raster = new TileLayer({
             source: new OSM()
         });
 
+        //Direction Arrows Layer
         var sourceArrows = new VectorSource();
-
         var styleFunction = function (feature) {
             var geometry = feature.getGeometry();
             var styles = [
                 // linestring
                 new Style({
                     stroke: new Stroke({
-                        color: '#ffcc33',
+                        color: '#000000',
                         width: 2
                     })
                 })
@@ -195,26 +200,150 @@
             return styles;
         };
 
-
         var vectorArrows = new VectorLayer({
             source: sourceArrows,
             style: styleFunction
         });
 
+        //Course Layer
+        var vector = new VectorLayer({
+            source: new VectorSource(),
+            style: new Style({
+                fill: new Fill({
+                    color: 'rgba(255, 255, 255, 0.2)'
+                }),
+                stroke: new Stroke({
+                    color: '#ffcc33',
+                    width: 2
+                }),
+                image: new CircleStyle({
+                    radius: 7,
+                    fill: new Fill({
+                        color: '#ffcc33'
+                    })
+                })
+            })
+        });
 
+        // Render combined image to browser "map" element
         var map = new Map({
-            layers: [raster, vectorArrows, Marks],
+            layers: [raster, Marks, vector, vectorArrows],
             target: 'map',
             view: new View({
-                center: routeCoords[2],
+                center: routeCoords[2],//[0, 0],
                 zoom: 15
             })
         });
 
-        map.addInteraction(new Draw({
-            source: sourceArrows,
-            type: 'LineString'
-        }));
+        var ExampleModify = {
+            init: function () {
+                this.select = new Select();
+                map.addInteraction(this.select);
+
+                this.modify = new Modify({
+                    features: this.select.getFeatures()
+                });
+                map.addInteraction(this.modify);
+
+                this.setEvents();
+            },
+            setEvents: function () {
+                var selectedFeatures = this.select.getFeatures();
+
+                this.select.on('change:active', function () {
+                    selectedFeatures.forEach(function (each) {
+                        selectedFeatures.remove(each);
+                    });
+                });
+            },
+            setActive: function (active) {
+                this.select.setActive(active);
+                this.modify.setActive(active);
+            }
+        };
+
+        ExampleModify.init();
+
+        ExampleModify.modify.on('modifyend', function (evt) {
+            var collection = evt.features;
+            collection.forEach(function (feature) {
+                feature.setStyle(styleFunction);
+            });
+        });
+
+        var optionsForm = document.getElementById('options-form');
+
+        var ExampleDraw = {
+            init: function () {
+                map.addInteraction(this.Point);
+                this.Point.setActive(false);
+                map.addInteraction(this.LineString);
+
+                this.LineString.setActive(false);
+                map.addInteraction(this.Polygon);
+                this.Polygon.setActive(false);
+                map.addInteraction(this.Circle);
+                this.Circle.setActive(false);
+            },
+            Point: new Draw({
+                source: vector.getSource(),
+                type: 'Point'
+            }),
+            LineString: new Draw({
+                source: vector.getSource(),
+                type: 'LineString'
+            }),
+            Polygon: new Draw({
+                source: vector.getSource(),
+                type: 'Polygon'
+            }),
+            Circle: new Draw({
+                source: vector.getSource(),
+                type: 'Circle'
+            }),
+
+            getActive: function () {
+                return this.activeType ? this[this.activeType].getActive() : false;
+            },
+            setActive: function (active) {
+                var type = optionsForm.elements['draw-type'].value;
+                if (active) {
+                    this.activeType && this[this.activeType].setActive(false);
+                    this[type].setActive(true);
+                    this.activeType = type;
+                } else {
+                    this.activeType && this[this.activeType].setActive(false);
+                    this.activeType = null;
+                }
+            }
+        };
+        ExampleDraw.init();
+
+        ExampleDraw.LineString.on('drawend', function (evt) {
+            var collection = evt.feature.setStyle(styleFunction);
+        });
+        /**
+         * Let user change the geometry type.
+         * @param {Event} e Change event.
+         */
+        optionsForm.onchange = function (e) {
+            var type = e.target.getAttribute('name');
+            var value = e.target.value;
+            if (type == 'draw-type') {
+                ExampleDraw.getActive() && ExampleDraw.setActive(true);
+            } else if (type == 'interaction') {
+                if (value == 'modify') {
+                    ExampleDraw.setActive(false);
+                    ExampleModify.setActive(true);
+                } else if (value == 'draw') {
+                    ExampleDraw.setActive(true);
+                    ExampleModify.setActive(false);
+                }
+            }
+        };
+
+        ExampleDraw.setActive(true);
+        ExampleModify.setActive(false);
 
         // The snap interaction must be added after the Modify and Draw interactions
         // in order for its map browser event handlers to be fired first. Its handlers
@@ -223,6 +352,7 @@
             source: Marks.getSource()
         });
         map.addInteraction(snap);
+
 
 
     </script>
