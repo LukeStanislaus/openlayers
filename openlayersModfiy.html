@@ -129,13 +129,7 @@
         var source = new VectorSource({
             features: Markfeatures //features
         });
-
-
-        var styleCache = {};
-        var Marks = new VectorLayer({
-            source: source,
-
-            style: function (feature) {
+let MarkStyle = (direction) => function (feature) {
                 var size = 0;//feature.get('features').length;
                 var style = styleCache[size];
                 if (!style) {
@@ -146,7 +140,7 @@
                                 color: '#fff'
                             }),
                             fill: new Fill({
-                                color: '#3399CC'
+                                color: direction? 'red':'blue'
                             })
                         }),
                         text: new Text({
@@ -158,8 +152,14 @@
                     });
                     return style; // styleCache[size] = style;
                 }
-                // return style;
-            }
+                }
+
+        var styleCache = {};
+        var Marks = new VectorLayer({
+            source: source,
+
+            style: MarkStyle(true),
+            
         });
         //Map Image Layer
         var raster = new TileLayer({
@@ -355,7 +355,17 @@ ExampleModify.modify.on('modifyend', function(evt){
         map.addInteraction(snap);
 
 
+        var featureListener = function ( event ) {
+};
 
+map.on('click', function(event) {
+console.log(event)
+    map.forEachFeatureAtPixel(event.pixel, function(feature,layer) {
+                feature.setStyle(MarkStyle(false));
+                featureListener(event);
+        
+    });
+});
     </script>
 </body>
 </html>
