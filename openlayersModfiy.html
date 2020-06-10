@@ -157,9 +157,9 @@ let MarkStyle = (direction) => function (feature) {
         var styleCache = {};
         var Marks = new VectorLayer({
             source: source,
-
             style: MarkStyle(true),
-            
+            className: "Marks",
+            id:"Marks"
         });
         //Map Image Layer
         var raster = new TileLayer({
@@ -355,14 +355,13 @@ ExampleModify.modify.on('modifyend', function(evt){
         map.addInteraction(snap);
 
 
-        var featureListener = function ( event ) {
-};
+
 
 map.on('click', function(event) {
-console.log(event)
     map.forEachFeatureAtPixel(event.pixel, function(feature,layer) {
-                feature.setStyle(MarkStyle(false));
-                featureListener(event);
+    if( !layer ) return 
+    
+    if (layer.get("id")== "Marks") feature.setStyle(MarkStyle(false))
         
     });
 });
