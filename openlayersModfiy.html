@@ -1,7 +1,8 @@
-﻿
-<html>
+﻿<html>
+
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/css/ol.css" type="text/css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/css/ol.css" type="text/css">
     <style>
         .map {
             height: 400px;
@@ -11,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/build/ol.js"></script>
     <title>OpenLayers Modify</title>
 </head>
+
 <body>
     <form id="options-form" automplete="off">
         <div class="radio">
@@ -123,13 +125,13 @@
         var Markfeatures = new Array(count);
         //var e = 4500000;
         for (var i = 0; i < count; ++i) {
-            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations1[i][2] });
+            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations1[i][2], markColour:"red" });
         }
 
         var source = new VectorSource({
             features: Markfeatures //features
         });
-let MarkStyle = (direction) => function (feature) {
+        let MarkStyle= function (feature) {
                 var size = 0;//feature.get('features').length;
                 var style = styleCache[size];
                 if (!style) {
@@ -140,26 +142,27 @@ let MarkStyle = (direction) => function (feature) {
                                 color: '#fff'
                             }),
                             fill: new Fill({
-                                color: direction? 'red':'blue'
+                                color: feature.get("markColour")
                             })
                         }),
                         text: new Text({
                             text: feature.get("name"),
                             fill: new Fill({
-                                color: '#fff'
+                                color: 'white'
                             })
                         })
                     });
                     return style; // styleCache[size] = style;
                 }
-                }
+            }
+        
 
         var styleCache = {};
         var Marks = new VectorLayer({
             source: source,
-            style: MarkStyle(true),
+            style: MarkStyle,
             className: "Marks",
-            id:"Marks"
+            id: "Marks"
         });
         //Map Image Layer
         var raster = new TileLayer({
@@ -264,13 +267,13 @@ let MarkStyle = (direction) => function (feature) {
         };
 
         ExampleModify.init();
-ExampleModify.modify.on('modifyend', function(evt){
-    var collection = evt.features;
+        ExampleModify.modify.on('modifyend', function (evt) {
+            var collection = evt.features;
 
-    collection.forEach(function(feature){
-        feature.setStyle(styleFunction);
-    });
-});
+            collection.forEach(function (feature) {
+                feature.setStyle(styleFunction);
+            });
+        });
 
         var optionsForm = document.getElementById('options-form');
 
@@ -320,10 +323,10 @@ ExampleModify.modify.on('modifyend', function(evt){
         };
         ExampleDraw.init();
 
-        ExampleDraw.LineString.on('drawend', function(evt){
-    var collection = evt.feature.setStyle(styleFunction);
-});
-        /**
+        ExampleDraw.LineString.on('drawend', function (evt) {
+            var collection = evt.feature.setStyle(styleFunction);
+        });
+        /***
          * Let user change the geometry type.
          * @param {Event} e Change event.
          */
@@ -354,17 +357,33 @@ ExampleModify.modify.on('modifyend', function(evt){
         });
         map.addInteraction(snap);
 
+let array =[{"1" : true}]
 
 
+        map.on('click', function (event) {
+            map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
+                if (!layer) return
 
-map.on('click', function(event) {
-    map.forEachFeatureAtPixel(event.pixel, function(feature,layer) {
-    if( !layer ) return 
-    
-    if (layer.get("id")== "Marks") feature.setStyle(MarkStyle(false))
+                if (layer.get("id") == "Marks") {
         
-    });
-});
+                    switch (feature.get("markColour")) {
+                        case "blue":
+                        feature.set("markColour", "green");
+                        break;
+                        case "green":
+                        feature.set("markColour", "red");
+                        break;
+                        case "red":
+                        feature.set("markColour", "blue");
+                        break;                    
+                        default:
+                            break;
+                    }
+
+                }
+            });
+        });
     </script>
 </body>
+
 </html>
