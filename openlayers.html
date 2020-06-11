@@ -1,7 +1,8 @@
-
 <html>
+
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/css/ol.css" type="text/css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/css/ol.css" type="text/css">
     <style>
         .map {
             height: 400px;
@@ -11,6 +12,7 @@
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/build/ol.js"></script>
     <title>OpenLayers Modify</title>
 </head>
+
 <body>
     <form id="options-form" automplete="off">
         <div class="radio">
@@ -92,7 +94,7 @@
             [51.66131, -1.935907, "8"],  // Mark : 8
             [51.659638, -1.933742, "9"],  // Mark : 9
             [51.659233, -1.930221, "Hut"],  // Mark : Hut
-            [51.658144, -1.934895, "A"], //Mark : A
+            [51.658144, -1.934895, "A"], //Mark : A 
             [51.658112, -1.936521, "B"], //Mark : B
             [51.657318, -1.937959, "C"],//Mark : C
         ];
@@ -116,25 +118,20 @@
         var routeCoords = route.getCoordinates();
 
 
+        //document.getElementById("Var1").innerHTML = routeCoords[0];
+        //document.getElementById("Var2").innerHTML = center;
 
         var count = locations1.length;
         var Markfeatures = new Array(count);
         //var e = 4500000;
         for (var i = 0; i < count; ++i) {
-            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations1[i][2] });
+            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations1[i][2], markColour:"blue" });
         }
 
         var source = new VectorSource({
             features: Markfeatures //features
         });
-
-
-        var styleCache = {};
-
-        //Marks Layer
-        var Marks = new VectorLayer({
-            source: source,
-            style: function (feature) {
+        let MarkStyle= function (feature) {
                 var size = 0;//feature.get('features').length;
                 var style = styleCache[size];
                 if (!style) {
@@ -145,22 +142,28 @@
                                 color: '#fff'
                             }),
                             fill: new Fill({
-                                color: '#3399CC'
+                                color: feature.get("markColour")
                             })
                         }),
                         text: new Text({
                             text: feature.get("name"),
                             fill: new Fill({
-                                color: '#fff'
+                                color: 'white'
                             })
                         })
                     });
                     return style; // styleCache[size] = style;
                 }
-                // return style;
             }
-        });
+        
 
+        var styleCache = {};
+        var Marks = new VectorLayer({
+            source: source,
+            style: MarkStyle,
+            className: "Marks",
+            id: "Marks"
+        });
         //Map Image Layer
         var raster = new TileLayer({
             source: new OSM()
@@ -168,13 +171,14 @@
 
         //Direction Arrows Layer
         var sourceArrows = new VectorSource();
+
         var styleFunction = function (feature) {
             var geometry = feature.getGeometry();
             var styles = [
                 // linestring
                 new Style({
                     stroke: new Stroke({
-                        color: '#000000',
+                        color: '#ffcc33',
                         width: 2
                     })
                 })
@@ -263,9 +267,9 @@
         };
 
         ExampleModify.init();
-
         ExampleModify.modify.on('modifyend', function (evt) {
             var collection = evt.features;
+
             collection.forEach(function (feature) {
                 feature.setStyle(styleFunction);
             });
@@ -322,7 +326,7 @@
         ExampleDraw.LineString.on('drawend', function (evt) {
             var collection = evt.feature.setStyle(styleFunction);
         });
-        /**
+        /***
          * Let user change the geometry type.
          * @param {Event} e Change event.
          */
@@ -355,6 +359,30 @@
 
 
 
+        map.on('click', function (event) {
+            map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
+                if (!layer) return
+
+                if (layer.get("id") == "Marks") {
+        
+                    switch (feature.get("markColour")) {
+                        case "blue":
+                        feature.set("markColour", "green");
+                        break;
+                        case "green":
+                        feature.set("markColour", "red");
+                        break;
+                        case "red":
+                        feature.set("markColour", "blue");
+                        break;                    
+                        default:
+                        break;
+                    }
+
+                }
+            });
+        });
     </script>
 </body>
+
 </html>
