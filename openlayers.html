@@ -83,7 +83,7 @@
 
 
         var locations_ArrayOfHardcodedRacingFeatures = [
-            [51.659887, -1.930908,"0"],  // Mark : 0
+            [51.659887, -1.932075,"0"],  // Mark : 0
             [51.657782, -1.929267, "1"],  // Mark : 1
             [51.658665, -1.92788, "2"],  // Mark : 2
             [51.659887, -1.927568, "3"],  // Mark : 3
@@ -128,8 +128,11 @@
         var MarkSource = new VectorSource({
             features: Markfeatures //features
         });
-        var styleCache = {};
-        let MarkStyle= function (feature) {                
+
+        
+        let MarkStyle= function (feature) {
+                // I don't understand why var styleCache needs to be declared in this way.
+                var styleCache = {};                
                 var style = styleCache[0];
                 if (!style) {
                     style = new Style({
@@ -155,32 +158,30 @@
         
 
         
-        var Marks = new VectorLayer({
+        let Marks = new VectorLayer({
             source: MarkSource,
             style: MarkStyle,
             className: "Marks",
             id: "Marks"
         });
         //Map Image Layer
-        var raster = new TileLayer({
+        let raster = new TileLayer({
             source: new OSM()
         });
 
-        //Direction Arrows Layer
-        var sourceArrows = new VectorSource();
 
-        var styleFunction = function (feature) {
+
+        let styleFunction = function (feature) {
             var geometry = feature.getGeometry();
             var styles = [
                 // linestring
                 new Style({
                     stroke: new Stroke({
-                        color: '#ffcc33',
+                        color: 'yellow',
                         width: 2
                     })
                 })
             ];
-
             geometry.forEachSegment(function (start, end) {
                 var dx = end[0] - start[0];
                 var dy = end[1] - start[1];
@@ -201,19 +202,15 @@
             return styles;
         };
 
-        var vectorArrows = new VectorLayer({
-            source: sourceArrows,
-            style: styleFunction
-        });
-
         //Course Layer
         var vector = new VectorLayer({
             source: new VectorSource(),
+
         });
 
         // Render combined image to browser "map" element
         var map = new Map({
-            layers: [raster, Marks, vector, vectorArrows],
+            layers: [raster, Marks, vector],
             target: 'map',
             view: new View({
                 center: routeCoords[2],//[0, 0],
@@ -333,15 +330,10 @@
         ExampleModify.setActive(false);
 
         // The snap interaction must be added after the Modify and Draw interactions
-        // in order for its map browser event handlers to be fired first. Its handlers
-        // are responsible of doing the snapping.
-        var snap = new Snap({
-            source: Marks.getSource()
-        });
+
+       var snap = new Snap({ source: MarkSource});
+
         map.addInteraction(snap);
-
-
-
         map.on('click', function (event) {
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
                 if (!layer) return
@@ -365,6 +357,7 @@
                 }
             });
         });
+    
     </script>
 </body>
 
