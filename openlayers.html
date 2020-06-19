@@ -83,7 +83,7 @@
 
 
         var locations_ArrayOfHardcodedRacingFeatures = [
-            //[51.658665, -1.92788,"0"],  // Mark : 0
+            [51.659887, -1.930908,"0"],  // Mark : 0
             [51.657782, -1.929267, "1"],  // Mark : 1
             [51.658665, -1.92788, "2"],  // Mark : 2
             [51.659887, -1.927568, "3"],  // Mark : 3
@@ -117,20 +117,20 @@
 
         var routeCoords = route.getCoordinates();
 
-
+        //Create and array containing coordinates name and colour of each mark
         var count = locations_ArrayOfHardcodedRacingFeatures.length;
         var Markfeatures = new Array(count);
-        //var e = 4500000;
+        
         for (var i = 0; i < count; ++i) {
             Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour:"blue" });
         }
 
-        var source = new VectorSource({
+        var MarkSource = new VectorSource({
             features: Markfeatures //features
         });
-        let MarkStyle= function (feature) {
-                var size = 0;//feature.get('features').length;
-                var style = styleCache[size];
+        var styleCache = {};
+        let MarkStyle= function (feature) {                
+                var style = styleCache[0];
                 if (!style) {
                     style = new Style({
                         image: new CircleStyle({
@@ -149,14 +149,14 @@
                             })
                         })
                     });
-                    return style; // styleCache[size] = style;
+                    return style;
                 }
             }
         
 
-        var styleCache = {};
+        
         var Marks = new VectorLayer({
-            source: source,
+            source: MarkSource,
             style: MarkStyle,
             className: "Marks",
             id: "Marks"
