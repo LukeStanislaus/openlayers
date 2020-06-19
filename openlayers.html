@@ -244,7 +244,6 @@
                 this.modify.setActive(active);
             }
         };
-
         ExampleModify.init();
         ExampleModify.modify.on('modifyend', function (evt) {
             var collection = evt.features;
@@ -253,8 +252,6 @@
                 feature.setStyle(styleFunction);
             });
         });
-
-        var optionsForm = document.getElementById('options-form');
 
         var ExampleDraw = {
             init: function () {
@@ -301,7 +298,6 @@
             }
         };
         ExampleDraw.init();
-
         ExampleDraw.LineString.on('drawend', function (evt) {
             var collection = evt.feature.setStyle(styleFunction);
 
@@ -310,6 +306,7 @@
          * Let user change the geometry type.
          * @param {Event} e Change event.
          */
+        var optionsForm = document.getElementById('options-form');
         optionsForm.onchange = function (e) {
             var type = e.target.getAttribute('name');
             var value = e.target.value;
@@ -329,12 +326,11 @@
         ExampleDraw.setActive(true);
         ExampleModify.setActive(false);
 
-        // The snap interaction must be added after the Modify and Draw interactions
-
+       // The snap interaction must be added after the Modify and Draw interactions
        var snap = new Snap({ source: MarkSource});
+       map.addInteraction(snap);
 
-        map.addInteraction(snap);
-        map.on('click', function (event) {
+       map.on('click', function (event) {
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
                 if (!layer) return
 
