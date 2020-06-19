@@ -296,7 +296,12 @@
         ExampleDraw.init();
         ExampleDraw.LineString.on('drawend', function (evt) {
             var collection = evt.feature.setStyle(styleFunction);
-
+            let routeCoords = evt.feature.values_.geometry.flatCoordinates;
+            var count = routeCoords.length/2;
+            console.log("Number of points in route :" + count)
+            for (var i = 0; i < count; ++i) {
+                console.log( 'Index : ' + routeCoords.indexOf(routeCoords[i*2]));
+            }
         });
         /***
          * Let user change the geometry type.
