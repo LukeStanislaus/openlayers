@@ -131,11 +131,7 @@
 
         
         let MarkStyle= function (feature) {
-                // I don't understand why var styleCache needs to be declared in this way.
-                var styleCache = {};                
-                var style = styleCache[0];
-                if (!style) {
-                    style = new Style({
+                    return new Style({
                         image: new CircleStyle({
                             radius: 10,
                             stroke: new Stroke({
@@ -152,8 +148,8 @@
                             })
                         })
                     });
-                    return style;
-                }
+                    
+                
             }
         
 
