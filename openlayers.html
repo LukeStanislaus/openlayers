@@ -28,7 +28,7 @@
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="interaction" value="modify">
+                <input type="radio" name="interaction" value="modify" id="modify">
                 Modify &nbsp;
             </label>
         </div>
@@ -243,6 +243,7 @@
             }
         };
         ExampleModify.init();
+
         ExampleModify.modify.on('modifyend', function (evt) {
             var collection = evt.features;
 
@@ -296,6 +297,8 @@
             }
         };
         ExampleDraw.init();
+
+
         ExampleDraw.LineString.on('drawend', function (evt) {
             var collection = evt.feature.setStyle(styleFunction);
             
@@ -312,7 +315,9 @@
             console.log(routeCoords)
             document.getElementById("demo").innerHTML = "Course :" + courseTxt //"Number of points in route :" + routeCoords.length
             ExampleDraw.setActive(false);
-             ExampleModify.setActive(true);
+            ExampleModify.setActive(true);
+            document.getElementById("draw").checked = false;
+            document.getElementById("modify").checked = true;
         });
 
         function myFunction(value,index,array) {
@@ -372,6 +377,7 @@
         // Cycle through colour of marks if a mark happens to have been selected
         map.on('click', function (event) {
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
+                if(document.getElementById("draw").checked) return
                 if (!layer) return
 
                 if (layer.get("id") == "Marks") {
@@ -384,7 +390,7 @@
                             feature.set("markColour", "red");
                             break;
                         case "red":
-                            feature.set("markColour", "blue");
+                            feature.set("markColour", "green");
                             break;
                         default:
                             break;
