@@ -14,11 +14,11 @@
 </head>
 
 <body>
-    
+
     <p id="demo">JavaScript can change HTML content.</p>
 
     <button type="button" onclick='document.getElementById("demo").innerHTML = "Hello JavaScript!"'>Click Me!</button>
-    
+
     <form id="options-form" automplete="off">
         <div class="radio">
             <label>
@@ -44,7 +44,7 @@
         </div>
         <div id="map" class="map"></div>
     </form>
-    
+
     <script>
 
         //import Feature from 'ol/Feature.js';
@@ -84,7 +84,7 @@
 
 
         var locations_ArrayOfHardcodedRacingFeatures = [
-            [51.659887, -1.932075,"0"],  // Mark : 0
+            [51.659887, -1.932075, "0"],  // Mark : 0
             [51.657782, -1.929267, "1"],  // Mark : 1
             [51.658665, -1.92788, "2"],  // Mark : 2
             [51.659887, -1.927568, "3"],  // Mark : 3
@@ -121,40 +121,40 @@
         //Create and array containing coordinates name and colour of each mark
         var count = locations_ArrayOfHardcodedRacingFeatures.length;
         var Markfeatures = new Array(count);
-        
+
         for (var i = 0; i < count; ++i) {
-            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour:"blue" });
+            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour: "blue" });
         }
 
         var MarkSource = new VectorSource({
             features: Markfeatures //features
         });
 
-        
-        let MarkStyle= function (feature) {
-                    return new Style({
-                        image: new CircleStyle({
-                            radius: 10,
-                            stroke: new Stroke({
-                                color: '#fff'
-                            }),
-                            fill: new Fill({
-                                color: feature.get("markColour")
-                            })
-                        }),
-                        text: new Text({
-                            text: feature.get("name"),
-                            fill: new Fill({
-                                color: 'white'
-                            })
-                        })
-                    });
-                    
-                
-            }
-        
 
-        
+        let MarkStyle = function (feature) {
+            return new Style({
+                image: new CircleStyle({
+                    radius: 10,
+                    stroke: new Stroke({
+                        color: '#fff'
+                    }),
+                    fill: new Fill({
+                        color: feature.get("markColour")
+                    })
+                }),
+                text: new Text({
+                    text: feature.get("name"),
+                    fill: new Fill({
+                        color: 'white'
+                    })
+                })
+            });
+
+
+        }
+
+
+
         let Marks = new VectorLayer({
             source: MarkSource,
             style: MarkStyle,
@@ -298,16 +298,48 @@
         ExampleDraw.init();
         ExampleDraw.LineString.on('drawend', function (evt) {
             var collection = evt.feature.setStyle(styleFunction);
-            let routeCoords = evt.feature.values_.geometry.flatCoordinates;
-            var count = routeCoords.length/2;
             
-            console.log("Number of points in route :" + count)
-            document.getElementById("demo").innerHTML = "Number of points in route :" + count
+            let routeCoords = evt.feature.getGeometry().getCoordinates().map(
+                function (elem) { 
+                    return map.getPixelFromCoordinate(elem)
+                     }
+            );
             
-            for (var i = 0; i < count; ++i) {
-                console.log( 'Index : ' + routeCoords.indexOf(routeCoords[i*2]));
-            }
+            courseTxt = "";
+            routeCoords.forEach(myFunction)
+
+            console.log("Number of points in route :" + routeCoords.length)
+            console.log(routeCoords)
+            document.getElementById("demo").innerHTML = "Course :" + courseTxt //"Number of points in route :" + routeCoords.length
+            
         });
+
+        function myFunction(value,index,array) {
+            let portStarbord = "notSet"
+            map.forEachFeatureAtPixel(value, function (feature, layer) {
+                if (!layer) return
+
+                if (layer.get("id") == "Marks") {
+                    console.log(feature.get("markColour"))
+                    switch (feature.get("markColour")) {
+                        case "blue":
+                            portStarbord = "notSet";
+                            break;
+                        case "green":
+                            portStarbord = "s"; 
+                            break;
+                        case "red":
+                            portStarbord = "p";
+                            break;
+                        default:
+                            break;
+                    }
+                    console.log(feature.get("name")+portStarbord)
+                    courseTxt = courseTxt + " " + feature.get("name")+"("+portStarbord+")"
+                }
+            });
+            
+        }
         /***
          * Let user change the geometry type.
          * @param {Event} e Change event.
@@ -332,35 +364,35 @@
         ExampleDraw.setActive(true);
         ExampleModify.setActive(false);
 
-       // The snap interaction must be added after the Modify and Draw interactions
-       var snap = new Snap({ source: MarkSource});
-       map.addInteraction(snap);
+        // The snap interaction must be added after the Modify and Draw interactions
+        var snap = new Snap({ source: MarkSource });
+        map.addInteraction(snap);
 
         // Cycle through colour of marks if a mark happens to have been selected
-       map.on('click', function (event) {
+        map.on('click', function (event) {
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
                 if (!layer) return
 
                 if (layer.get("id") == "Marks") {
-        
+
                     switch (feature.get("markColour")) {
                         case "blue":
-                        feature.set("markColour", "green");
-                        break;
+                            feature.set("markColour", "green");
+                            break;
                         case "green":
-                        feature.set("markColour", "red");
-                        break;
+                            feature.set("markColour", "red");
+                            break;
                         case "red":
-                        feature.set("markColour", "blue");
-                        break;                    
+                            feature.set("markColour", "blue");
+                            break;
                         default:
-                        break;
+                            break;
                     }
 
                 }
             });
         });
-    
+
     </script>
 </body>
 
