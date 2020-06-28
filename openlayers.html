@@ -158,7 +158,6 @@
         let Marks = new VectorLayer({
             source: MarkSource,
             style: MarkStyle,
-            className: "Marks",
             id: "Marks"
         });
         //Map Image Layer
@@ -202,7 +201,7 @@
         //Course Layer
         var vector = new VectorLayer({
             source: new VectorSource(),
-
+            id: "Course"
         });
 
         // Render combined image to browser "map" element
@@ -270,7 +269,7 @@
             }),
             LineString: new Draw({
                 source: vector.getSource(),
-                type: 'LineString'
+                type: 'LineString',
             }),
             Polygon: new Draw({
                 source: vector.getSource(),
@@ -301,15 +300,15 @@
 
         ExampleDraw.LineString.on('drawend', function (evt) {
             var collection = evt.feature.setStyle(styleFunction);
-            
+
             let routeCoords = evt.feature.getGeometry().getCoordinates().map(
-                function (elem) { 
+                function (elem) {
                     return map.getPixelFromCoordinate(elem)
-                     }
+                }
             );
-            
+
             courseTxt = "";
-            routeCoords.forEach(myFunction)
+            routeCoords.forEach(ListPortStarboard)
 
             console.log("Number of points in route :" + routeCoords.length)
             console.log(routeCoords)
@@ -320,10 +319,14 @@
             document.getElementById("modify").checked = true;
         });
 
-        function myFunction(value,index,array) {
+        function ListPortStarboard(value, index, array) {
             let portStarbord = "notSet"
             map.forEachFeatureAtPixel(value, function (feature, layer) {
-                if (!layer) return
+                if (!layer) {
+
+                    console.log("Not a layer")
+                    return
+                }
 
                 if (layer.get("id") == "Marks") {
                     console.log(feature.get("markColour"))
@@ -332,7 +335,7 @@
                             portStarbord = "notSet";
                             break;
                         case "green":
-                            portStarbord = "s"; 
+                            portStarbord = "s";
                             break;
                         case "red":
                             portStarbord = "p";
@@ -340,11 +343,11 @@
                         default:
                             break;
                     }
-                    console.log(feature.get("name")+portStarbord)
-                    courseTxt = courseTxt + " " + feature.get("name")+"("+portStarbord+")"
+                    console.log(feature.get("name") + portStarbord)
+                    courseTxt = courseTxt + " " + feature.get("name") + "(" + portStarbord + ")"
                 }
             });
-            
+
         }
         /***
          * Let user change the geometry type.
@@ -377,8 +380,29 @@
         // Cycle through colour of marks if a mark happens to have been selected
         map.on('click', function (event) {
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-                if(document.getElementById("draw").checked) return
+                if (document.getElementById("draw").checked) return
+                if (!feature) return
                 if (!layer) return
+                if (layer.get("id") == "Course") {
+                    //list course in here?
+                    let routeCoords = feature.getGeometry().getCoordinates().map(
+                        function (elem) {
+                            return map.getPixelFromCoordinate(elem)
+                        }
+                    );
+
+                    //let courseTxt = "";
+                    routeCoords.forEach(ListPortStarboard)
+
+                    console.log("Number of points in route :" + routeCoords.length)
+                    console.log(routeCoords)
+                    document.getElementById("demo").innerHTML = "Course :" + courseTxt //"Number of points in route :" + routeCoords.length
+                    courseTxt ="";
+                    ExampleDraw.setActive(false);
+                    ExampleModify.setActive(true);
+                    document.getElementById("draw").checked = false;
+                    document.getElementById("modify").checked = true;
+                }
 
                 if (layer.get("id") == "Marks") {
 
@@ -390,13 +414,16 @@
                             feature.set("markColour", "red");
                             break;
                         case "red":
-                            feature.set("markColour", "green");
+                            feature.set("markColour", "blue");
                             break;
                         default:
                             break;
                     }
 
+
+
                 }
+
             });
         });
 
