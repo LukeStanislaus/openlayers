@@ -381,23 +381,20 @@
         map.on('click', function (event) {
             let markSelected = false;
             let CourseSelected = false;
+            
 
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
 
                 if (!layer) return
-
+                selectedFeature = feature;
                 switch (layer.get("id")) {
                     case "Marks":
+                    
                         markSelected = true;
-                        let MarkCoords = feature.getGeometry().getCoordinates().map(
-                            function (elem) {
-                                return map.getPixelFromCoordinate(elem)
-                            }
-                        );
                         break;
                     case "Course":
                         CourseSelected = true;
-                        let routeCoords = feature.getGeometry().getCoordinates().map(
+                        let routeCoords = selecteFeature.getGeometry().getCoordinates().map(
                             function (elem) {
                                 return map.getPixelFromCoordinate(elem)
                             }
@@ -412,15 +409,15 @@
 
             if (markSelected = true) {
 
-                switch (MarkCoords.get("markColour")) {
+                switch (selectedFeature.get("markColour")) {
                     case "blue":
-                        MarkCoords.set("markColour", "green");
+                    selectedFeature.set("markColour", "green");
                         break;
                     case "green":
-                        MarkCoords.set("markColour", "red");
+                    selectedFeature.set("markColour", "red");
                         break;
                     case "red":
-                        MarkCoords.set("markColour", "blue");
+                    selectedFeature.set("markColour", "blue");
                         break;
                     default:
                         break;
