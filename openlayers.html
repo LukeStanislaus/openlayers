@@ -383,62 +383,62 @@
             let CourseSelected = false;
 
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-                
+
                 if (!layer) return
-                
-                switch (layer.get("id")){
+
+                switch (layer.get("id")) {
                     case "Marks":
-                    markSelected = true;
-                    break;
+                        markSelected = true;
+                        break;
                     case "Course":
-                    CourseSelected = true;
-                    let routeCoords = feature.getGeometry().getCoordinates().map(
-                        function (elem) {
-                            return map.getPixelFromCoordinate(elem)
-                        }
-                    );
-                    break;
+                        CourseSelected = true;
+                        let routeCoords = feature.getGeometry().getCoordinates().map(
+                            function (elem) {
+                                return map.getPixelFromCoordinate(elem)
+                            }
+                        );
+                        break;
                     default:
-                            break;                    
+                        break;
                 }
 
             });
 
 
-            if ( markSelected = true) {
-                    markSelected = true;
-                    switch (feature.get("markColour")) {
-                        case "blue":
-                            feature.set("markColour", "green");
-                            break;
-                        case "green":
-                            feature.set("markColour", "red");
-                            break;
-                        case "red":
-                            feature.set("markColour", "blue");
-                            break;
-                        default:
-                            break;
-                    }
+            if (markSelected = true) {
+                
+                switch (feature.get("markColour")) {
+                    case "blue":
+                        feature.set("markColour", "green");
+                        break;
+                    case "green":
+                        feature.set("markColour", "red");
+                        break;
+                    case "red":
+                        feature.set("markColour", "blue");
+                        break;
+                    default:
+                        break;
                 }
+            }
 
-                if (CourseSelected=true) {
-                    //list course in here?
+            if (CourseSelected = true) {
+                //list course in here?
 
 
-                    //let courseTxt = "";
-                    routeCoords.forEach(ListPortStarboard)
+                //let courseTxt = "";
+                routeCoords.forEach(ListPortStarboard)
 
-                    console.log("Number of points in route :" + routeCoords.length)
-                    console.log(routeCoords)
-                    document.getElementById("demo").innerHTML = "Course :" + courseTxt //"Number of points in route :" + routeCoords.length
-                    courseTxt = "";
-                    ExampleDraw.setActive(false);
-                    ExampleModify.setActive(true);
-                    document.getElementById("draw").checked = false;
-                    document.getElementById("modify").checked = true;
-                }
-
+                console.log("Number of points in route :" + routeCoords.length)
+                console.log(routeCoords)
+                document.getElementById("demo").innerHTML = "Course :" + courseTxt //"Number of points in route :" + routeCoords.length
+                courseTxt = "";
+                ExampleDraw.setActive(false);
+                ExampleModify.setActive(true);
+                document.getElementById("draw").checked = false;
+                document.getElementById("modify").checked = true;
+            }
+        });
 
     </script>
 </body>
