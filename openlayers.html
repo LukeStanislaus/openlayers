@@ -381,6 +381,7 @@
         map.on('click', function (event) {
             let markSelected = false;
             let CourseSelected = false;
+            if (!feature) return
             selectedFeature = feature;
 
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
