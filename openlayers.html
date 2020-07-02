@@ -383,9 +383,11 @@
                 if (document.getElementById("draw").checked) return
                 if (!feature) return
                 if (!layer) return
+                let selecteFeature = feature;
                 if (layer.get("id") == "Course") {
                     //list course in here?
-                    let routeCoords = feature.getGeometry().getCoordinates().map(
+                    
+                    let routeCoords = selecteFeature.getGeometry().getCoordinates().map(
                         function (elem) {
                             return map.getPixelFromCoordinate(elem)
                         }
@@ -406,7 +408,7 @@
 
                 if (layer.get("id") == "Marks") {
 
-                    switch (feature.get("markColour")) {
+                    switch (selecteFeature.get("markColour")) {
                         case "blue":
                             feature.set("markColour", "green");
                             break;
