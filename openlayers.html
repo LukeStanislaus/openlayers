@@ -440,62 +440,6 @@
                 }
 
 
-            map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-                
-                if (!layer) return
-                
-                if (layer.get("id") == "Marks") {
-                    markSelected = true;
-                    switch (feature.get("markColour")) {
-                        case "blue":
-                            feature.set("markColour", "green");
-                            break;
-                        case "green":
-                            feature.set("markColour", "red");
-                            break;
-                        case "red":
-                            feature.set("markColour", "blue");
-                            break;
-                        default:
-                            break;
-                    }
-
-
-
-                }
-
-            });
-
-            map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-            
-                if (document.getElementById("draw").checked) return
-                if (!feature) return
-                if (!layer) return
-                if (layer.get("id") == "Course") {
-                    //list course in here?
-                    let routeCoords = feature.getGeometry().getCoordinates().map(
-                        function (elem) {
-                            return map.getPixelFromCoordinate(elem)
-                        }
-                    );
-
-                    //let courseTxt = "";
-                    routeCoords.forEach(ListPortStarboard)
-
-                    console.log("Number of points in route :" + routeCoords.length)
-                    console.log(routeCoords)
-                    document.getElementById("demo").innerHTML = "Course :" + courseTxt //"Number of points in route :" + routeCoords.length
-                    courseTxt = "";
-                    ExampleDraw.setActive(false);
-                    ExampleModify.setActive(true);
-                    document.getElementById("draw").checked = false;
-                    document.getElementById("modify").checked = true;
-                }
-
-
-            });
-        });
-
     </script>
 </body>
 
