@@ -379,17 +379,52 @@
 
         // Cycle through colour of marks if a mark happens to have been selected
         map.on('click', function (event) {
+            let markSelected = false;
+            let CourseSelected = false;
+
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-                if (document.getElementById("draw").checked) return
-                if (!feature) return
+                
                 if (!layer) return
-                if (layer.get("id") == "Course") {
-                    //list course in here?
+                
+                switch (layer.get("id")){
+                    case "Marks":
+                    markSelected = true;
+                    break;
+                    case "Course":
+                    CourseSelected = true;
                     let routeCoords = feature.getGeometry().getCoordinates().map(
                         function (elem) {
                             return map.getPixelFromCoordinate(elem)
                         }
                     );
+                    break;
+                    default:
+                            break;                    
+                }
+
+            });
+
+
+            if ( markSelected = true) {
+                    markSelected = true;
+                    switch (feature.get("markColour")) {
+                        case "blue":
+                            feature.set("markColour", "green");
+                            break;
+                        case "green":
+                            feature.set("markColour", "red");
+                            break;
+                        case "red":
+                            feature.set("markColour", "blue");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (CourseSelected=true) {
+                    //list course in here?
+
 
                     //let courseTxt = "";
                     routeCoords.forEach(ListPortStarboard)
@@ -397,15 +432,20 @@
                     console.log("Number of points in route :" + routeCoords.length)
                     console.log(routeCoords)
                     document.getElementById("demo").innerHTML = "Course :" + courseTxt //"Number of points in route :" + routeCoords.length
-                    courseTxt ="";
+                    courseTxt = "";
                     ExampleDraw.setActive(false);
                     ExampleModify.setActive(true);
                     document.getElementById("draw").checked = false;
                     document.getElementById("modify").checked = true;
                 }
 
-                if (layer.get("id") == "Marks") {
 
+            map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
+                
+                if (!layer) return
+                
+                if (layer.get("id") == "Marks") {
+                    markSelected = true;
                     switch (feature.get("markColour")) {
                         case "blue":
                             feature.set("markColour", "green");
@@ -423,6 +463,35 @@
 
 
                 }
+
+            });
+
+            map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
+            
+                if (document.getElementById("draw").checked) return
+                if (!feature) return
+                if (!layer) return
+                if (layer.get("id") == "Course") {
+                    //list course in here?
+                    let routeCoords = feature.getGeometry().getCoordinates().map(
+                        function (elem) {
+                            return map.getPixelFromCoordinate(elem)
+                        }
+                    );
+
+                    //let courseTxt = "";
+                    routeCoords.forEach(ListPortStarboard)
+
+                    console.log("Number of points in route :" + routeCoords.length)
+                    console.log(routeCoords)
+                    document.getElementById("demo").innerHTML = "Course :" + courseTxt //"Number of points in route :" + routeCoords.length
+                    courseTxt = "";
+                    ExampleDraw.setActive(false);
+                    ExampleModify.setActive(true);
+                    document.getElementById("draw").checked = false;
+                    document.getElementById("modify").checked = true;
+                }
+
 
             });
         });
