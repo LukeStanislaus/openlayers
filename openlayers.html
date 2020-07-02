@@ -381,12 +381,12 @@
         map.on('click', function (event) {
             let markSelected = false;
             let CourseSelected = false;
-            
+            selectedFeature = feature;
 
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
 
                 if (!layer) return
-                selectedFeature = feature;
+                
                 switch (layer.get("id")) {
                     case "Marks":
                     
