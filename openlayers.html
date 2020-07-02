@@ -389,6 +389,11 @@
                 switch (layer.get("id")) {
                     case "Marks":
                         markSelected = true;
+                        let MarkCoords = feature.getGeometry().getCoordinates().map(
+                            function (elem) {
+                                return map.getPixelFromCoordinate(elem)
+                            }
+                        );
                         break;
                     case "Course":
                         CourseSelected = true;
@@ -406,16 +411,16 @@
 
 
             if (markSelected = true) {
-                
-                switch (feature.get("markColour")) {
+
+                switch (MarkCoords.get("markColour")) {
                     case "blue":
-                        feature.set("markColour", "green");
+                        MarkCoords.set("markColour", "green");
                         break;
                     case "green":
-                        feature.set("markColour", "red");
+                        MarkCoords.set("markColour", "red");
                         break;
                     case "red":
-                        feature.set("markColour", "blue");
+                        MarkCoords.set("markColour", "blue");
                         break;
                     default:
                         break;
