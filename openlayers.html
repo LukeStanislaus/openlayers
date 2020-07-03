@@ -301,23 +301,54 @@
         ExampleDraw.LineString.on('drawend', function (evt) {
             var collection = evt.feature.setStyle(styleFunction);
 
-            let routeCoords = evt.feature.getGeometry().getCoordinates().map(
+            routeCoordsPixel = evt.feature.getGeometry().getCoordinates().map(
                 function (elem) {
                     return map.getPixelFromCoordinate(elem)
                 }
             );
 
             courseTxt = "";
-            routeCoords.forEach(ListPortStarboard)
+            routeCoordsPixel.forEach(ListPortStarboard)
 
-            console.log("Number of points in route :" + routeCoords.length)
-            console.log(routeCoords)
+            console.log("Number of points in route :" + routeCoordsPixel.length)
+            console.log(routeCoordsPixel)
             document.getElementById("demo").innerHTML = "Course :" + courseTxt //"Number of points in route :" + routeCoords.length
             ExampleDraw.setActive(false);
             ExampleModify.setActive(true);
             document.getElementById("draw").checked = false;
             document.getElementById("modify").checked = true;
         });
+
+        function ListPortStarboard1(value, index, array) {
+            let portStarbord = "notSet"
+            map.forEachFeatureAtPixel(value, function (feature, layer) {
+                if (!layer) {
+
+                    console.log("Not a layer")
+                    return
+                }
+
+                if (layer.get("id") == "Marks") {
+                    console.log(feature.get("markColour"))
+                    switch (feature.get("markColour")) {
+                        case "blue":
+                            portStarbord = "notSet";
+                            break;
+                        case "green":
+                            portStarbord = "s";
+                            break;
+                        case "red":
+                            portStarbord = "p";
+                            break;
+                        default:
+                            break;
+                    }
+                    console.log(feature.get("name") + portStarbord)
+                    courseTxt = courseTxt + " " + feature.get("name") + "(" + portStarbord + ")"
+                }
+            });
+
+        }
 
         function ListPortStarboard(value, index, array) {
             let portStarbord = "notSet"
@@ -396,11 +427,7 @@
                         break;
                     case "Course":
                         CourseSelected = true;
-                        let routeCoords = selectedFeature.getGeometry().getCoordinates().map(
-                            function (elem) {
-                                return map.getPixelFromCoordinate(elem)
-                            }
-                        );
+                       
                         break;
                     default:
                         break;
@@ -431,11 +458,11 @@
 
 
                 //let courseTxt = "";
-                routeCoords.forEach(ListPortStarboard)
+                routeCoordsPixel.forEach(ListPortStarboard1)
 
-                console.log("Number of points in route :" + routeCoords.length)
-                console.log(routeCoords)
-                document.getElementById("demo").innerHTML = "Course :" + courseTxt //"Number of points in route :" + routeCoords.length
+                console.log("Number of points in route :" + routeCoordsPixel.length)
+                console.log(routeCoordsPixel)
+                document.getElementById("demo").innerHTML = "Course :" + courseTxt 
                 courseTxt = "";
                 ExampleDraw.setActive(false);
                 ExampleModify.setActive(true);
