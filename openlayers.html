@@ -48,42 +48,42 @@
     <script>
 
         //import Feature from 'ol/Feature.js';
-        var Feature = ol.Feature;
+        let Feature = ol.Feature;
         //import Map from 'ol/Map.js';
-        var Map = ol.Map;
+        let Map = ol.Map;
         //import View from 'ol/View.js';
-        var View = ol.View;
+        let View = ol.View;
         //import Point from 'ol/geom/Point.js';
-        var Point = ol.geom.Point;
+        let Point = ol.geom.Point;
 
         //import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer.js';
-        var TileLayer = ol.layer.Tile;
-        var VectorLayer = ol.layer.Vector;
+        let TileLayer = ol.layer.Tile;
+        let VectorLayer = ol.layer.Vector;
 
         //import {Cluster, OSM, Vector as VectorSource} from 'ol/source.js';
-        var Cluster = ol.source.Cluster;
-        var OSM = ol.source.OSM;
-        var VectorSource = ol.source.Vector;
+        let Cluster = ol.source.Cluster;
+        let OSM = ol.source.OSM;
+        let VectorSource = ol.source.Vector;
 
-        //="var " & B26 & "= ol.style." & B26 & ";"
+        //="let " & B26 & "= ol.style." & B26 & ";"
         //import {Circle as CircleStyle, Fill, Stroke, Style, Text} from 'ol/style.js';
-        var Circle = ol.style.Circle;
-        var CircleStyle = ol.style.Circle;
-        var Fill = ol.style.Fill;
-        var Stroke = ol.style.Stroke;
-        var Style = ol.style.Style;
-        var Text = ol.style.Text;
-        var Icon = ol.style.Icon
+        let Circle = ol.style.Circle;
+        let CircleStyle = ol.style.Circle;
+        let Fill = ol.style.Fill;
+        let Stroke = ol.style.Stroke;
+        let Style = ol.style.Style;
+        let Text = ol.style.Text;
+        let Icon = ol.style.Icon
 
 
         //import {Draw, Modify, Select, Snap} from 'ol/interaction.js';
-        var Draw = ol.interaction.Draw;
-        var Modify = ol.interaction.Modify;
-        var Select = ol.interaction.Select;
-        var Snap = ol.interaction.Snap;
+        let Draw = ol.interaction.Draw;
+        let Modify = ol.interaction.Modify;
+        let Select = ol.interaction.Select;
+        let Snap = ol.interaction.Snap;
 
 
-        var locations_ArrayOfHardcodedRacingFeatures = [
+        let locations_ArrayOfHardcodedRacingFeatures = [
             [51.659887, -1.932075, "0"],  // Mark : 0
             [51.657782, -1.929267, "1"],  // Mark : 1
             [51.658665, -1.92788, "2"],  // Mark : 2
@@ -100,11 +100,11 @@
             [51.657318, -1.937959, "C"],//Mark : C
         ];
 
-        var MarkNames = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
+        let MarkNames = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
             return val[2];//.slice(2, 0);
         });
 
-        var locations = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
+        let locations = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
             return val.slice(0, -1);
         });
 
@@ -113,20 +113,20 @@
             return l.reverse();
         });
 
-        var route = new ol.geom.LineString(locations)
+        let route = new ol.geom.LineString(locations)
             .transform('EPSG:4326', 'EPSG:3857');
 
-        var routeCoords = route.getCoordinates();
+        let routeCoords = route.getCoordinates();
 
         //Create and array containing coordinates name and colour of each mark
-        var count = locations_ArrayOfHardcodedRacingFeatures.length;
-        var Markfeatures = new Array(count);
+        let count = locations_ArrayOfHardcodedRacingFeatures.length;
+        let Markfeatures = new Array(count);
 
-        for (var i = 0; i < count; ++i) {
+        for (let i = 0; i < count; ++i) {
             Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour: "blue" });
         }
 
-        var MarkSource = new VectorSource({
+        let MarkSource = new VectorSource({
             features: Markfeatures //features
         });
 
@@ -168,8 +168,8 @@
 
 
         let styleFunction = function (feature) {
-            var geometry = feature.getGeometry();
-            var styles = [
+            let geometry = feature.getGeometry();
+            let styles = [
                 // linestring
                 new Style({
                     stroke: new Stroke({
@@ -179,10 +179,10 @@
                 })
             ];
             geometry.forEachSegment(function (start, end) {
-                var dx = end[0] - start[0];
-                var dy = end[1] - start[1];
-                var mid = [start[0] + dx * 0.75, start[1] + dy * 0.75];
-                var rotation = Math.atan2(dy, dx);
+                let dx = end[0] - start[0];
+                let dy = end[1] - start[1];
+                let mid = [start[0] + dx * 0.75, start[1] + dy * 0.75];
+                let rotation = Math.atan2(dy, dx);
                 // arrows
                 styles.push(new Style({
                     geometry: new Point(mid),
@@ -199,13 +199,13 @@
         };
 
         //Course Layer
-        var vector = new VectorLayer({
+        let vector = new VectorLayer({
             source: new VectorSource(),
             id: "Course"
         });
 
         // Render combined image to browser "map" element
-        var map = new Map({
+        let map = new Map({
             layers: [raster, Marks, vector],
             target: 'map',
             view: new View({
@@ -215,7 +215,7 @@
         });
 
 
-        var ExampleModify = {
+        let ExampleModify = {
             init: function () {
                 this.select = new Select();
                 map.addInteraction(this.select);
@@ -228,7 +228,7 @@
                 this.setEvents();
             },
             setEvents: function () {
-                var features = this.select.getFeatures();
+                let features = this.select.getFeatures();
 
                 this.select.on('change:active', function () {
                     features.forEach(function (each) {
@@ -244,14 +244,14 @@
         ExampleModify.init();
 
         ExampleModify.modify.on('modifyend', function (evt) {
-            var collection = evt.features;
+            let collection = evt.features;
 
             collection.forEach(function (feature) {
                 feature.setStyle(styleFunction);
             });
         });
 
-        var ExampleDraw = {
+        let ExampleDraw = {
             init: function () {
                 map.addInteraction(this.Point);
                 this.Point.setActive(false);
@@ -284,7 +284,7 @@
                 return this.activeType ? this[this.activeType].getActive() : false;
             },
             setActive: function (active) {
-                var type = optionsForm.elements['draw-type'].value;
+                let type = optionsForm.elements['draw-type'].value;
                 if (active) {
                     this.activeType && this[this.activeType].setActive(false);
                     this[type].setActive(true);
@@ -299,7 +299,7 @@
 
 
         ExampleDraw.LineString.on('drawend', function (evt) {
-            var collection = evt.feature.setStyle(styleFunction);
+            let collection = evt.feature.setStyle(styleFunction);
 
             routeCoordsPixel = evt.feature.getGeometry().getCoordinates().map(
                 function (elem) {
@@ -354,10 +354,10 @@
          * Let user change the geometry type.
          * @param {Event} e Change event.
          */
-        var optionsForm = document.getElementById('options-form');
+        let optionsForm = document.getElementById('options-form');
         optionsForm.onchange = function (e) {
-            var type = e.target.getAttribute('name');
-            var value = e.target.value;
+            let type = e.target.getAttribute('name');
+            let value = e.target.value;
             if (type == 'draw-type') {
                 ExampleDraw.getActive() && ExampleDraw.setActive(true);
             } else if (type == 'interaction') {
@@ -375,7 +375,7 @@
         ExampleModify.setActive(false);
 
         // The snap interaction must be added after the Modify and Draw interactions
-        var snap = new Snap({ source: MarkSource });
+        let snap = new Snap({ source: MarkSource });
         map.addInteraction(snap);
 
         // Cycle through colour of marks if a mark happens to have been selected
