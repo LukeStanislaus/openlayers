@@ -228,11 +228,11 @@
                 this.setEvents();
             },
             setEvents: function () {
-                var selectedFeatures = this.select.getFeatures();
+                var features = this.select.getFeatures();
 
                 this.select.on('change:active', function () {
-                    selectedFeatures.forEach(function (each) {
-                        selectedFeatures.remove(each);
+                    features.forEach(function (each) {
+                        features.remove(each);
                     });
                 });
             },
@@ -307,8 +307,7 @@
                 }
             );
 
-            courseTxt = "";
-            routeCoordsPixel.forEach(ListPortStarboard)
+            let courseTxt = routeCoordsPixel.reduce(ListPortStarboard, "")
 
             console.log("Number of points in route :" + routeCoordsPixel.length)
             console.log(routeCoordsPixel)
@@ -319,7 +318,8 @@
             document.getElementById("modify").checked = true;
         });
 
-        function ListPortStarboard1(value, index, array) {
+
+        function ListPortStarboard(total, value) {
             let portStarbord = "notSet"
             map.forEachFeatureAtPixel(value, function (feature, layer) {
                 if (!layer) {
@@ -343,42 +343,12 @@
                         default:
                             break;
                     }
-                    console.log(feature.get("name") + portStarbord)
-                    courseTxt = courseTxt + " " + feature.get("name") + "(" + portStarbord + ")"
+                   // console.log(feature.get("name") + "(" + portStarbord + ")")
+                    total = total + " " + feature.get("name") + "(" + portStarbord + ")"
                 }
             });
 
-        }
-
-        function ListPortStarboard(value, index, array) {
-            let portStarbord = "notSet"
-            map.forEachFeatureAtPixel(value, function (feature, layer) {
-                if (!layer) {
-
-                    console.log("Not a layer")
-                    return
-                }
-
-                if (layer.get("id") == "Marks") {
-                    console.log(feature.get("markColour"))
-                    switch (feature.get("markColour")) {
-                        case "blue":
-                            portStarbord = "notSet";
-                            break;
-                        case "green":
-                            portStarbord = "s";
-                            break;
-                        case "red":
-                            portStarbord = "p";
-                            break;
-                        default:
-                            break;
-                    }
-                    console.log(feature.get("name") + portStarbord)
-                    courseTxt = courseTxt + " " + feature.get("name") + "(" + portStarbord + ")"
-                }
-            });
-
+            return total
         }
         /***
          * Let user change the geometry type.
@@ -415,60 +385,57 @@
 
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
                 if (!feature) return
-                selectedFeature = feature;
                 if (!layer) return
                 let markSelected = false;
                 let CourseSelected = false;
 
                 switch (layer.get("id")) {
                     case "Marks":
-
                         markSelected = true;
                         break;
                     case "Course":
                         CourseSelected = true;
-                       
                         break;
                     default:
                         break;
                 }
+
+
+                if (markSelected = true) {
+
+                    switch (feature.get("markColour")) {
+                        case "blue":
+                            feature.set("markColour", "green");
+                            break;
+                        case "green":
+                            feature.set("markColour", "red");
+                            break;
+                        case "red":
+                            feature.set("markColour", "blue");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (CourseSelected = true) {
+
+                    //list course in here?
+
+
+                    let courseTxt = routeCoordsPixel.reduce(ListPortStarboard, "")
+
+                    console.log("Number of points in route :" + routeCoordsPixel.length)
+                    console.log(routeCoordsPixel)
+                    document.getElementById("demo").innerHTML = "Course :" + courseTxt
+                    ExampleDraw.setActive(false);
+                    ExampleModify.setActive(true);
+                    document.getElementById("draw").checked = false;
+                    document.getElementById("modify").checked = true;
+                }
+
 
             });
-
-
-            if (markSelected = true) {
-
-                switch (selectedFeature.get("markColour")) {
-                    case "blue":
-                        selectedFeature.set("markColour", "green");
-                        break;
-                    case "green":
-                        selectedFeature.set("markColour", "red");
-                        break;
-                    case "red":
-                        selectedFeature.set("markColour", "blue");
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (CourseSelected = true) {
-                //list course in here?
-
-
-                //let courseTxt = "";
-                routeCoordsPixel.forEach(ListPortStarboard1)
-
-                console.log("Number of points in route :" + routeCoordsPixel.length)
-                console.log(routeCoordsPixel)
-                document.getElementById("demo").innerHTML = "Course :" + courseTxt 
-                courseTxt = "";
-                ExampleDraw.setActive(false);
-                ExampleModify.setActive(true);
-                document.getElementById("draw").checked = false;
-                document.getElementById("modify").checked = true;
-            }
         });
 
     </script>
