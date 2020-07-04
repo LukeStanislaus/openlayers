@@ -206,7 +206,8 @@
 
         // Render combined image to browser "map" element
         let map = new Map({
-            layers: [raster, Marks, vector],
+            interactions: ol.interaction.defaults({ doubleClickZoom: false }),
+            layers: [raster, vector, Marks],
             target: 'map',
             view: new View({
                 center: routeCoords[2],//[0, 0],
@@ -300,8 +301,8 @@
 
         ExampleDraw.LineString.on('drawend', function (evt) {
             let collection = evt.feature.setStyle(styleFunction);
-
-            routeCoordsPixel = evt.feature.getGeometry().getCoordinates().map(
+            console.log(evt.feature)
+            let routeCoordsPixel = evt.feature.getGeometry().getCoordinates().map(
                 function (elem) {
                     return map.getPixelFromCoordinate(elem)
                 }
@@ -343,7 +344,7 @@
                         default:
                             break;
                     }
-                   console.log(feature.get("name") + "(" + portStarbord + ")")
+                    // console.log(feature.get("name") + "(" + portStarbord + ")")
                     total = total + " " + feature.get("name") + "(" + portStarbord + ")"
                     return
                 }
@@ -385,25 +386,10 @@
 
 
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-                if (!feature) return
+                if(!feature) return
                 if (!layer) return
-                let markSelected = false;
-                let CourseSelected = false;
 
-                switch (layer.get("id")) {
-                    case "Marks":
-                        markSelected = true;
-                        break;
-                    case "Course":
-                        CourseSelected = true;
-                        break;
-                    default:
-                        break;
-                }
-
-
-                if (markSelected = true) {
-
+                if (layer.get('id')=="Marks") {
                     switch (feature.get("markColour")) {
                         case "blue":
                             feature.set("markColour", "green");
@@ -418,12 +404,14 @@
                             break;
                     }
                 }
-
-                if (CourseSelected = true) {
-
+                if (layer.get('id')=="Course")  {
                     //list course in here?
+                    let geom = feature.getGeometry()
+                    let coords = geom.getCoordinates()
+                    let routeCoordsPixel = coords.map(
+                        elem => map.getPixelFromCoordinate(elem)
 
-
+                    );
                     let courseTxt = routeCoordsPixel.reduce(ListPortStarboard, "")
 
                     console.log("Number of points in route :" + routeCoordsPixel.length)
@@ -432,11 +420,11 @@
                     ExampleDraw.setActive(false);
                     ExampleModify.setActive(true);
                     document.getElementById("draw").checked = false;
-                    document.getElementById("modify").checked = true;
+                    //document.getElementById("modify").checked = false;
                 }
 
 
-            });
+            }, { hitTolerance: 30 });
         });
 
     </script>
