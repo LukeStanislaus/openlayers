@@ -343,10 +343,11 @@
                         default:
                             break;
                     }
-                   // console.log(feature.get("name") + "(" + portStarbord + ")")
+                   console.log(feature.get("name") + "(" + portStarbord + ")")
                     total = total + " " + feature.get("name") + "(" + portStarbord + ")"
+                    return
                 }
-            });
+            },hitTolerance=5);
 
             return total
         }
