@@ -206,6 +206,7 @@
 
         // Render combined image to browser "map" element
         let map = new Map({
+            interactions: ol.interaction.defaults({ doubleClickZoom: false }),
             layers: [raster, Marks, vector],
             target: 'map',
             view: new View({
@@ -429,9 +430,9 @@
                     console.log(routeCoordsPixel)
                     document.getElementById("demo").innerHTML = "Course :" + courseTxt
                     ExampleDraw.setActive(false);
-                    ExampleModify.setActive(true);
+                    ExampleModify.setActive(false);
                     document.getElementById("draw").checked = false;
-                    document.getElementById("modify").checked = true;
+                    //document.getElementById("modify").checked = false;
                 }
 
 
