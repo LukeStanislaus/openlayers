@@ -84,28 +84,28 @@
 
 
         let locations_ArrayOfHardcodedRacingFeatures = [
-            [51.659887, -1.932075, "0"],  // Mark : 0
-            [51.657782, -1.929267, "1"],  // Mark : 1
-            [51.658665, -1.92788, "2"],  // Mark : 2
-            [51.659887, -1.927568, "3"],  // Mark : 3
-            [51.660719, -1.92771, "4"],  // Mark : 4
-            [51.66126, -1.930908, "5"],  // Mark : 5
-            [51.66246, -1.933075, "6"],  // Mark : 6
-            [51.662223, -1.934958, "7"],  // Mark : 7
-            [51.66131, -1.935907, "8"],  // Mark : 8
-            [51.659638, -1.933742, "9"],  // Mark : 9
-            [51.659233, -1.930221, "Hut"],  // Mark : Hut
-            [51.658144, -1.934895, "A"], //Mark : A 
-            [51.658112, -1.936521, "B"], //Mark : B
-            [51.657318, -1.937959, "C"],//Mark : C
+            [51.659887, -1.932075, "0", true],  // Mark : 0
+            [51.657782, -1.929267, "1", true],  // Mark : 1
+            [51.658665, -1.92788, "2", true],  // Mark : 2
+            [51.659887, -1.927568, "3", true],  // Mark : 3
+            [51.660719, -1.92771, "4", true],  // Mark : 4
+            [51.66126, -1.930908, "5", true],  // Mark : 5
+            [51.66246, -1.933075, "6", true],  // Mark : 6
+            [51.662223, -1.934958, "7", true],  // Mark : 7
+            [51.66131, -1.935907, "8", true],  // Mark : 8
+            [51.659638, -1.933742, "9", true],  // Mark : 9
+            [51.659233, -1.930221, "Hut", true],  // Mark : Hut
+            [51.658144, -1.934895, "A", true], //Mark : A 
+            [51.658112, -1.936521, "B", true], //Mark : B
+            [51.657318, -1.937959, "C", true],//Mark : C
         ];
 
-        let MarkNames = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
-            return val[2];//.slice(2, 0);
-        });
+        //let MarkNames = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
+        //    return val[2];//.slice(2, 0);
+       // });
 
         let locations = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
-            return val.slice(0, -1);
+            return val.slice(0, -2);
         });
 
         // OpenLayers uses [lon, lat], not [lat, lon]
@@ -123,7 +123,7 @@
         let Markfeatures = new Array(count);
 
         for (let i = 0; i < count; ++i) {
-            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour: "blue" });
+            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour: "blue",markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] }); //, markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] 
         }
 
         let MarkSource = new VectorSource({
