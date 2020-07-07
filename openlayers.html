@@ -102,7 +102,7 @@
 
         //let MarkNames = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
         //    return val[2];//.slice(2, 0);
-       // });
+        // });
 
         let locations = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
             return val.slice(0, -2);
@@ -123,7 +123,7 @@
         let Markfeatures = new Array(count);
 
         for (let i = 0; i < count; ++i) {
-            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour: "blue",markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] }); //, markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] 
+            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour: "blue", markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] }); //, markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] 
         }
 
         let MarkSource = new VectorSource({
@@ -178,6 +178,12 @@
                     })
                 })
             ];
+
+            // make sure there are more than one point in geometry
+            if (geometry.flatCoordinates.length / 2 == 1) {
+                return styles;
+            };
+            
             geometry.forEachSegment(function (start, end) {
                 let dx = end[0] - start[0];
                 let dy = end[1] - start[1];
@@ -388,10 +394,10 @@
 
 
             map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-                if(!feature) return
+                if (!feature) return
                 if (!layer) return
 
-                if (layer.get('id')=="Marks") {
+                if (layer.get('id') == "Marks") {
                     switch (feature.get("markColour")) {
 
                         case "blue":
@@ -407,7 +413,7 @@
                             break;
                     }
                 }
-                if (layer.get('id')=="Course")  {
+                if (layer.get('id') == "Course") {
                     //list course in here?
                     let geom = feature.getGeometry()
                     let coords = geom.getCoordinates()
