@@ -478,3 +478,4 @@
 [0610/212007.501:ERROR:scoped_process_suspend.cc(40)] NtResumeProcess: An attempt was made to access an exiting process. (0xc000010a)
 [0619/185510.987:ERROR:file_io.cc(89)] ReadExactly: expected 152, observed 40
 [0619/191706.301:ERROR:file_io.cc(89)] ReadExactly: expected 152, observed 40
+[0709/191752.776:ERROR:settings.cc(401)] Settings magic is not 1129342067

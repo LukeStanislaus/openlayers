@@ -230,8 +230,10 @@
                 this.modify = new Modify({
                     features: this.select.getFeatures(),
                     condition: function (event) {
-                        console.log(event.target)
-                         return false
+                        
+                        if (map.getFeaturesAtPixel(event.pixel).length<=1) return false
+                        console.log(map.getFeaturesAtPixel(event.pixel).length)
+                         return !map.getFeaturesAtPixel(event.pixel)[1].get("markFixed")
                     }
                 });
                 map.addInteraction(this.modify);
