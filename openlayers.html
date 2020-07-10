@@ -224,7 +224,11 @@
 
         let ExampleModify = {
             init: function () {
-                this.select = new Select();
+                this.select = new Select({
+                    filter: function(evt) {
+                        console.log("Filter select event here:")    
+                    }
+                });
                 map.addInteraction(this.select);
 
                 this.modify = new Modify({
