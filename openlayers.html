@@ -94,10 +94,11 @@
             [51.662223, -1.934958, "7", true],  // Mark : 7
             [51.66131, -1.935907, "8", true],  // Mark : 8
             [51.659638, -1.933742, "9", true],  // Mark : 9
-            [51.659233, -1.930221, "Hut", true],  // Mark : Hut
+            [51.659233, -1.930221, "Start", false],  // Mark : Start
             [51.658144, -1.934895, "A", true], //Mark : A 
             [51.658112, -1.936521, "B", true], //Mark : B
             [51.657318, -1.937959, "C", true],//Mark : C
+            [51.657318, -1.937959, "X", false],//Mark : X
         ];
 
         //let MarkNames = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
@@ -225,20 +226,16 @@
         let ExampleModify = {
             init: function () {
                 this.select = new Select({
-                    filter: function(evt) {
-                        console.log("Filter select event here:")    
+                    filter: function(feature, layer) {
+                        if (feature.get("markFixed") == null) return true
+                        else return !feature.get("markFixed")   
                     }
                 });
                 map.addInteraction(this.select);
 
                 this.modify = new Modify({
-                    features: this.select.getFeatures(),
-                    condition: function (event) {
-                        
-                        if (map.getFeaturesAtPixel(event.pixel).length<=1) return false
-                        console.log(map.getFeaturesAtPixel(event.pixel).length)
-                         return !map.getFeaturesAtPixel(event.pixel)[1].get("markFixed")
-                    }
+                    features: this.select.getFeatures()
+                    
                 });
                 map.addInteraction(this.modify);
 
