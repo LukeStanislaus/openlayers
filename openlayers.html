@@ -330,7 +330,7 @@
 
 
         function ListPortStarboard(total, value) {
-            let portStarbord = "notSet"
+            let portStarbord = "?"
             map.forEachFeatureAtPixel(value, function (feature, layer) {
                 if (!layer) {
 
@@ -342,10 +342,10 @@
                     console.log(feature.get("markColour"))
                     switch (feature.get("markColour")) {
                         case "blue":
-                            portStarbord = "notSet";
+                            portStarbord = "?";
                             break;
                         case "orange":
-                            portStarbord = "notSet";
+                            portStarbord = "?";
                             break;
                         case "green":
                             portStarbord = "s";
