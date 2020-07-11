@@ -77,24 +77,24 @@
 
 
         let locations_ArrayOfHardcodedRacingFeatures = [
-            [51.659887, -1.932075, "0", true],  // Mark : 0
-            [51.657782, -1.929267, "1", true],  // Mark : 1
-            [51.658665, -1.92788, "2", true],  // Mark : 2
-            [51.659887, -1.927568, "3", true],  // Mark : 3
-            [51.660719, -1.92771, "4", true],  // Mark : 4
-            [51.66126, -1.930908, "5", true],  // Mark : 5
-            [51.66246, -1.933075, "6", true],  // Mark : 6
-            [51.662223, -1.934958, "7", true],  // Mark : 7
-            [51.66131, -1.935907, "8", true],  // Mark : 8
-            [51.659638, -1.933742, "9", true],  // Mark : 9
-            [51.658144, -1.934895, "A", true], //Mark : A 
-            [51.658112, -1.936521, "B", true], //Mark : B
-            [51.657318, -1.937959, "C", true],//Mark : C
-            [51.659233, -1.930221, "S1", false],  // Mark : Start
-            [51.659233, -1.929, "S2", false],  // Mark : Start
-            [51.6593, -1.931000, "X", false],//Mark : X
-            [51.659, -1.931000, "Y", false],//Mark : X
-            [51.6587, -1.931000, "U", false],//Mark : X
+            [51.659887, -1.932075, "0", true, "blue"],  // Mark : 0
+            [51.657782, -1.929267, "1", true, "blue"],  // Mark : 1
+            [51.658665, -1.92788, "2", true, "blue"],  // Mark : 2
+            [51.659887, -1.927568, "3", true, "blue"],  // Mark : 3
+            [51.660719, -1.92771, "4", true, "blue"],  // Mark : 4
+            [51.66126, -1.930908, "5", true, "blue"],  // Mark : 5
+            [51.66246, -1.933075, "6", true, "blue"],  // Mark : 6
+            [51.662223, -1.934958, "7", true, "blue"],  // Mark : 7
+            [51.66131, -1.935907, "8", true, "blue"],  // Mark : 8
+            [51.659638, -1.933742, "9", true, "blue"],  // Mark : 9
+            [51.658144, -1.934895, "A", true, "blue"], //Mark : A 
+            [51.658112, -1.936521, "B", true, "blue"], //Mark : B
+            [51.657318, -1.937959, "C", true, "blue"],//Mark : C
+            [51.659233, -1.930221, "S1", false, "black"],  // Mark : Start
+            [51.659233, -1.929, "S2", false, "black"],  // Mark : Start
+            [51.6593, -1.931000, "X", false, "orange"],//Mark : X
+            [51.659, -1.931000, "Y", false, "orange"],//Mark : X
+            [51.6587, -1.931000, "U", false, "orange"],//Mark : X
         ];
 
         //let MarkNames = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
@@ -102,7 +102,7 @@
         // });
 
         let locations = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
-            return val.slice(0, -2);
+            return val.slice(0, -3);
         });
 
         // OpenLayers uses [lon, lat], not [lat, lon]
@@ -120,7 +120,7 @@
         let Markfeatures = new Array(count);
 
         for (let i = 0; i < count; ++i) {
-            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour: "blue", markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] }); //, markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] 
+            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour: locations_ArrayOfHardcodedRacingFeatures[i][4], markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] }); //, markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] 
         }
 
         let MarkSource = new VectorSource({
@@ -222,16 +222,16 @@
         let ExampleModify = {
             init: function () {
                 this.select = new Select({
-                    filter: function(feature, layer) {
+                    filter: function (feature, layer) {
                         if (feature.get("markFixed") == null) return true
-                        else return !feature.get("markFixed")   
+                        else return !feature.get("markFixed")
                     }
                 });
                 map.addInteraction(this.select);
 
                 this.modify = new Modify({
                     features: this.select.getFeatures()
-                    
+
                 });
                 map.addInteraction(this.modify);
 
@@ -344,6 +344,9 @@
                         case "blue":
                             portStarbord = "notSet";
                             break;
+                        case "orange":
+                            portStarbord = "notSet";
+                            break;
                         case "green":
                             portStarbord = "s";
                             break;
@@ -411,6 +414,9 @@
                             break;
                         case "red":
                             feature.set("markColour", "blue");
+                            break; 
+                            case "orange":
+                            feature.set("markColour", "green");
                             break;
                         default:
                             break;
@@ -436,7 +442,7 @@
                 }
 
 
-            }, { hitTolerance: 30 });
+            });
         });
 
     </script>
