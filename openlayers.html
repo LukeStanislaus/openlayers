@@ -1,11 +1,8 @@
 <html>
 
 <head>
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/css/ol.css" type="text/css">
-
-    <link rel="stylesheet" type="text/css" href="openlayers.css">
-    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/build/ol.js"></script>
+    <link rel="stylesheet" type="text/css" href="./libs/v6.3.1-dist/ol.css">
+    <script src="./libs/v6.3.1-dist/ol.js"></script>
     <title>OpenLayers Modify</title>
 </head>
 
@@ -77,6 +74,8 @@
 
 
         let locations_ArrayOfHardcodedRacingFeatures = [
+            [51.659233, -1.930221, "S1", false, "black"],  // Mark : Start
+            [51.659233, -1.929, "S2", false, "black"],  // Mark : Start
             [51.659887, -1.932075, "0", true, "blue"],  // Mark : 0
             [51.657782, -1.929267, "1", true, "blue"],  // Mark : 1
             [51.658665, -1.92788, "2", true, "blue"],  // Mark : 2
@@ -90,8 +89,7 @@
             [51.658144, -1.934895, "A", true, "blue"], //Mark : A 
             [51.658112, -1.936521, "B", true, "blue"], //Mark : B
             [51.657318, -1.937959, "C", true, "blue"],//Mark : C
-            [51.659233, -1.930221, "S1", false, "black"],  // Mark : Start
-            [51.659233, -1.929, "S2", false, "black"],  // Mark : Start
+
             [51.6593, -1.931000, "X", false, "orange"],//Mark : X
             [51.659, -1.931000, "Y", false, "orange"],//Mark : X
             [51.6587, -1.931000, "U", false, "orange"],//Mark : X
@@ -120,8 +118,36 @@
         let Markfeatures = new Array(count);
 
         for (let i = 0; i < count; ++i) {
-            Markfeatures[i] = new Feature({ geometry: new Point(routeCoords[i]), name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour: locations_ArrayOfHardcodedRacingFeatures[i][4], markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] }); //, markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] 
+            let marker = new Point(routeCoords[i])
+            Markfeatures[i] = new Feature({ geometry: marker, name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour: locations_ArrayOfHardcodedRacingFeatures[i][4], markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] }); //, markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] 
         }
+
+        var lineStyle = new ol.style.Style({
+            stroke: new ol.style.Stroke({ color: 'red', width: 3 })
+        });
+        var styleMarker = new ol.style.Style({
+            image: new CircleStyle({
+                radius: 9,
+                stroke: new Stroke({
+                    color: '#fff'
+                }),
+                fill: new Fill({
+                    color: 'red'
+                })
+            }),
+        });
+
+        var marker1 = Markfeatures[0].getGeometry();
+        var featureMarker1 = Markfeatures[0];
+        var marker2 = Markfeatures[1].getGeometry();
+        var featureMarker2 = Markfeatures[1];
+
+        var line = new ol.geom.LineString([Markfeatures[0].getGeometry().getCoordinates(), Markfeatures[1].getGeometry().getCoordinates()]);
+        var lineFeature = new ol.Feature(line);
+
+
+
+
 
         let MarkSource = new VectorSource({
             features: Markfeatures //features
@@ -150,17 +176,14 @@
 
         }
 
+        var vectorLine = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [lineFeature, featureMarker1, featureMarker2]
+            }),
+            style: MarkStyle //[lineStyle, MarkStyle]
+        });
 
 
-        let Marks = new VectorLayer({
-            source: MarkSource,
-            style: MarkStyle,
-            id: "Marks"
-        });
-        //Map Image Layer
-        let raster = new TileLayer({
-            source: new OSM()
-        });
 
 
 
@@ -190,7 +213,7 @@
                 styles.push(new Style({
                     geometry: new Point(mid),
                     image: new Icon({
-                        src: 'https://openlayers.org/en/v3.20.1/examples/data/arrow.png',
+                        src: './libs/arrow.png',
                         anchor: [0.75, 0.5],
                         rotateWithView: true,
                         rotation: -rotation
@@ -201,6 +224,16 @@
             return styles;
         };
 
+        let Marks = new VectorLayer({
+            source: MarkSource,
+            style: MarkStyle,
+            id: "Marks"
+        });
+        //Map Image Layer
+        let raster = new TileLayer({
+            source: new OSM()
+        });
+
         //Course Layer
         let vector = new VectorLayer({
             source: new VectorSource(),
@@ -210,12 +243,43 @@
         // Render combined image to browser "map" element
         let map = new Map({
             interactions: ol.interaction.defaults({ doubleClickZoom: false }),
-            layers: [raster, vector, Marks],
+            layers: [raster, vector, Marks, vectorLine],
             target: 'map',
             view: new View({
                 center: routeCoords[2],//[0, 0],
                 zoom: 16
             })
+        });
+
+
+
+        var translate1 = new ol.interaction.Translate({
+            features: new ol.Collection([featureMarker1])
+        });
+        var translate2 = new ol.interaction.Translate({
+            features: new ol.Collection([featureMarker2])
+        });
+        map.addInteraction(translate1);
+        map.addInteraction(translate2);
+
+        var coordMarker1, coordMarker2;
+        translate1.on('translatestart', function (evt) {
+            coordMarker2 = marker2.getCoordinates();
+        });
+        translate1.on('translating', function (evt) {
+            line.setCoordinates([coordMarker2, evt.coordinate]);
+        });
+        translate2.on('translatestart', function (evt) {
+            coordMarker1 = marker1.getCoordinates();
+        });
+        translate2.on('translating', function (evt) {
+            line.setCoordinates([coordMarker1, evt.coordinate]);
+        });
+
+        map.on('pointermove', function (e) {
+            if (e.dragging) return;
+            var hit = map.hasFeatureAtPixel(map.getEventPixel(e.originalEvent));
+            map.getTargetElement().style.cursor = hit ? 'pointer' : '';
         });
 
 
@@ -414,8 +478,8 @@
                             break;
                         case "red":
                             feature.set("markColour", "blue");
-                            break; 
-                            case "orange":
+                            break;
+                        case "orange":
                             feature.set("markColour", "green");
                             break;
                         default:
