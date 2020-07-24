@@ -1,0 +1,515 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="./libs/v6.3.1-dist/ol.css">
+    <script src="./libs/v6.3.1-dist/ol.js"></script>
+    <title>OpenLayers Modify</title>
+</head>
+
+<body>
+    <div id="courseText">Ready to create course</div>
+    <div id="map" class="map"></div>
+    <form id="options-form" automplete="off">
+        <div class="radio">
+            <label>
+                <input type="radio" name="interaction" value="draw" id="draw" checked>
+                Draw &nbsp;
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" name="interaction" value="modify" id="modify">
+                Modify &nbsp;
+            </label>
+        </div>
+        <div class="form-group">
+            <label>Draw type &nbsp;</label>
+            <select name="draw-type" id="draw-type">
+
+                <option value="LineString">LineString</option>
+                <option value="Point">Point</option>
+                <option value="Polygon">Polygon</option>
+                <option value="Circle">Circle</option>
+            </select>
+        </div>
+
+    </form>
+
+    <script>
+
+        //import Feature from 'ol/Feature.js';
+        let Feature = ol.Feature;
+        //import Map from 'ol/Map.js';
+        let Map = ol.Map;
+        //import View from 'ol/View.js';
+        let View = ol.View;
+        //import Point from 'ol/geom/Point.js';
+        let Point = ol.geom.Point;
+
+        //import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer.js';
+        let TileLayer = ol.layer.Tile;
+        let VectorLayer = ol.layer.Vector;
+
+        //import {Cluster, OSM, Vector as VectorSource} from 'ol/source.js';
+        let Cluster = ol.source.Cluster;
+        let OSM = ol.source.OSM;
+        let VectorSource = ol.source.Vector;
+
+        //="let " & B26 & "= ol.style." & B26 & ";"
+        //import {Circle as CircleStyle, Fill, Stroke, Style, Text} from 'ol/style.js';
+        let Circle = ol.style.Circle;
+        let CircleStyle = ol.style.Circle;
+        let Fill = ol.style.Fill;
+        let Stroke = ol.style.Stroke;
+        let Style = ol.style.Style;
+        let Text = ol.style.Text;
+        let Icon = ol.style.Icon
+
+
+        //import {Draw, Modify, Select, Snap} from 'ol/interaction.js';
+        let Draw = ol.interaction.Draw;
+        let Modify = ol.interaction.Modify;
+        let Select = ol.interaction.Select;
+        let Snap = ol.interaction.Snap;
+
+
+        let locations_ArrayOfHardcodedRacingFeatures = [
+            [51.659233, -1.930221, "S1", false, "black"],  // Mark : Start
+            [51.659233, -1.929, "S2", false, "black"],  // Mark : Start
+            [51.659887, -1.932075, "0", true, "blue"],  // Mark : 0
+            [51.657782, -1.929267, "1", true, "blue"],  // Mark : 1
+            [51.658665, -1.92788, "2", true, "blue"],  // Mark : 2
+            [51.659887, -1.927568, "3", true, "blue"],  // Mark : 3
+            [51.660719, -1.92771, "4", true, "blue"],  // Mark : 4
+            [51.66126, -1.930908, "5", true, "blue"],  // Mark : 5
+            [51.66246, -1.933075, "6", true, "blue"],  // Mark : 6
+            [51.662223, -1.934958, "7", true, "blue"],  // Mark : 7
+            [51.66131, -1.935907, "8", true, "blue"],  // Mark : 8
+            [51.659638, -1.933742, "9", true, "blue"],  // Mark : 9
+            [51.658144, -1.934895, "A", true, "blue"], //Mark : A 
+            [51.658112, -1.936521, "B", true, "blue"], //Mark : B
+            [51.657318, -1.937959, "C", true, "blue"],//Mark : C
+
+            [51.6593, -1.931000, "X", false, "orange"],//Mark : X
+            [51.659, -1.931000, "Y", false, "orange"],//Mark : X
+            [51.6587, -1.931000, "U", false, "orange"],//Mark : X
+        ];
+
+        //let MarkNames = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
+        //    return val[2];//.slice(2, 0);
+        // });
+
+        let locations = locations_ArrayOfHardcodedRacingFeatures.map(function (val) {
+            return val.slice(0, -3);
+        });
+
+        // OpenLayers uses [lon, lat], not [lat, lon]
+        locations.map(function (l) {
+            return l.reverse();
+        });
+
+        let route = new ol.geom.LineString(locations)
+            .transform('EPSG:4326', 'EPSG:3857');
+
+        let routeCoords = route.getCoordinates();
+
+        //Create and array containing coordinates name and colour of each mark
+        let count = locations_ArrayOfHardcodedRacingFeatures.length;
+        let Markfeatures = new Array(count);
+
+        for (let i = 0; i < count; ++i) {
+            let marker = new Point(routeCoords[i])
+            Markfeatures[i] = new Feature({ geometry: marker, name: locations_ArrayOfHardcodedRacingFeatures[i][2], markColour: locations_ArrayOfHardcodedRacingFeatures[i][4], markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] }); //, markFixed: locations_ArrayOfHardcodedRacingFeatures[i][3] 
+        }
+
+        var lineStyle = new ol.style.Style({
+            stroke: new ol.style.Stroke({ color: 'red', width: 3 })
+        });
+        var styleMarker = new ol.style.Style({
+            image: new CircleStyle({
+                radius: 9,
+                stroke: new Stroke({
+                    color: '#fff'
+                }),
+                fill: new Fill({
+                    color: 'red'
+                })
+            }),
+        });
+
+        var marker1 = Markfeatures[0].getGeometry();
+        var featureMarker1 = Markfeatures[0];
+        var marker2 = Markfeatures[1].getGeometry();
+        var featureMarker2 = Markfeatures[1];
+
+        var line = new ol.geom.LineString([Markfeatures[0].getGeometry().getCoordinates(), Markfeatures[1].getGeometry().getCoordinates()]);
+        var lineFeature = new ol.Feature(line);
+
+
+
+
+
+        let MarkSource = new VectorSource({
+            features: Markfeatures //features
+        });
+
+
+        let MarkStyle = function (feature) {
+            return new Style({
+                image: new CircleStyle({
+                    radius: 10,
+                    stroke: new Stroke({
+                        color: '#fff'
+                    }),
+                    fill: new Fill({
+                        color: feature.get("markColour")
+                    })
+                }),
+                text: new Text({
+                    text: feature.get("name"),
+                    fill: new Fill({
+                        color: 'white'
+                    })
+                })
+            });
+
+
+        }
+
+        var vectorLine = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [lineFeature, featureMarker1, featureMarker2]
+            }),
+            style: MarkStyle //[lineStyle, MarkStyle]
+        });
+
+
+
+
+
+        let styleFunction = function (feature) {
+            let geometry = feature.getGeometry();
+            let styles = [
+                // linestring
+                new Style({
+                    stroke: new Stroke({
+                        color: 'yellow',
+                        width: 2
+                    })
+                })
+            ];
+
+            // make sure there are more than one point in geometry
+            if (geometry.flatCoordinates.length / 2 == 1) {
+                return styles;
+            };
+
+            geometry.forEachSegment(function (start, end) {
+                let dx = end[0] - start[0];
+                let dy = end[1] - start[1];
+                let mid = [start[0] + dx * 0.75, start[1] + dy * 0.75];
+                let rotation = Math.atan2(dy, dx);
+                // arrows
+                styles.push(new Style({
+                    geometry: new Point(mid),
+                    image: new Icon({
+                        src: './libs/arrow.png',
+                        anchor: [0.75, 0.5],
+                        rotateWithView: true,
+                        rotation: -rotation
+                    })
+                }));
+            });
+
+            return styles;
+        };
+
+        let Marks = new VectorLayer({
+            source: MarkSource,
+            style: MarkStyle,
+            id: "Marks"
+        });
+        //Map Image Layer
+        let raster = new TileLayer({
+            source: new OSM()
+        });
+
+        //Course Layer
+        let vector = new VectorLayer({
+            source: new VectorSource(),
+            id: "Course"
+        });
+
+        // Render combined image to browser "map" element
+        let map = new Map({
+            interactions: ol.interaction.defaults({ doubleClickZoom: false }),
+            layers: [raster, vector, Marks, vectorLine],
+            target: 'map',
+            view: new View({
+                center: routeCoords[2],//[0, 0],
+                zoom: 16
+            })
+        });
+
+
+
+        var translate1 = new ol.interaction.Translate({
+            features: new ol.Collection([featureMarker1])
+        });
+        var translate2 = new ol.interaction.Translate({
+            features: new ol.Collection([featureMarker2])
+        });
+        map.addInteraction(translate1);
+        map.addInteraction(translate2);
+
+        var coordMarker1, coordMarker2;
+        translate1.on('translatestart', function (evt) {
+            coordMarker2 = marker2.getCoordinates();
+        });
+        translate1.on('translating', function (evt) {
+            line.setCoordinates([coordMarker2, evt.coordinate]);
+        });
+        translate2.on('translatestart', function (evt) {
+            coordMarker1 = marker1.getCoordinates();
+        });
+        translate2.on('translating', function (evt) {
+            line.setCoordinates([coordMarker1, evt.coordinate]);
+        });
+
+        map.on('pointermove', function (e) {
+            if (e.dragging) return;
+            var hit = map.hasFeatureAtPixel(map.getEventPixel(e.originalEvent));
+            map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+        });
+
+
+        let ExampleModify = {
+            init: function () {
+                this.select = new Select({
+                    filter: function (feature, layer) {
+                        if (feature.get("markFixed") == null) return true
+                        else return !feature.get("markFixed")
+                    }
+                });
+                map.addInteraction(this.select);
+
+                this.modify = new Modify({
+                    features: this.select.getFeatures()
+
+                });
+                map.addInteraction(this.modify);
+
+                this.setEvents();
+            },
+            setEvents: function () {
+                let features = this.select.getFeatures();
+
+                this.select.on('change:active', function () {
+                    features.forEach(function (each) {
+                        features.remove(each);
+                    });
+                });
+            },
+            setActive: function (active) {
+                this.select.setActive(active);
+                this.modify.setActive(active);
+            }
+        };
+        ExampleModify.init();
+
+        ExampleModify.modify.on('modifyend', function (evt) {
+            let collection = evt.features;
+
+            collection.forEach(function (feature) {
+                feature.setStyle(styleFunction);
+            });
+        });
+
+        let ExampleDraw = {
+            init: function () {
+                map.addInteraction(this.Point);
+                this.Point.setActive(false);
+                map.addInteraction(this.LineString);
+
+                this.LineString.setActive(false);
+                map.addInteraction(this.Polygon);
+                this.Polygon.setActive(false);
+                map.addInteraction(this.Circle);
+                this.Circle.setActive(false);
+            },
+            Point: new Draw({
+                source: vector.getSource(),
+                type: 'Point'
+            }),
+            LineString: new Draw({
+                source: vector.getSource(),
+                type: 'LineString',
+            }),
+            Polygon: new Draw({
+                source: vector.getSource(),
+                type: 'Polygon'
+            }),
+            Circle: new Draw({
+                source: vector.getSource(),
+                type: 'Circle'
+            }),
+
+            getActive: function () {
+                return this.activeType ? this[this.activeType].getActive() : false;
+            },
+            setActive: function (active) {
+                let type = optionsForm.elements['draw-type'].value;
+                if (active) {
+                    this.activeType && this[this.activeType].setActive(false);
+                    this[type].setActive(true);
+                    this.activeType = type;
+                } else {
+                    this.activeType && this[this.activeType].setActive(false);
+                    this.activeType = null;
+                }
+            }
+        };
+        ExampleDraw.init();
+
+
+        ExampleDraw.LineString.on('drawend', function (evt) {
+            let collection = evt.feature.setStyle(styleFunction);
+            console.log(evt.feature)
+            let routeCoordsPixel = evt.feature.getGeometry().getCoordinates().map(
+                function (elem) {
+                    return map.getPixelFromCoordinate(elem)
+                }
+            );
+
+            let courseTxt = routeCoordsPixel.reduce(ListPortStarboard, "")
+
+            console.log("Number of points in route :" + routeCoordsPixel.length)
+            console.log(routeCoordsPixel)
+            document.getElementById("courseText").innerHTML = "Course :" + courseTxt //"Number of points in route :" + routeCoords.length
+            ExampleDraw.setActive(false);
+            ExampleModify.setActive(true);
+            document.getElementById("draw").checked = false;
+            document.getElementById("modify").checked = true;
+        });
+
+
+        function ListPortStarboard(total, value) {
+            let portStarbord = "?"
+            map.forEachFeatureAtPixel(value, function (feature, layer) {
+                if (!layer) {
+
+                    console.log("Not a layer")
+                    return
+                }
+
+                if (layer.get("id") == "Marks") {
+                    console.log(feature.get("markColour"))
+                    switch (feature.get("markColour")) {
+                        case "blue":
+                            portStarbord = "?";
+                            break;
+                        case "orange":
+                            portStarbord = "?";
+                            break;
+                        case "green":
+                            portStarbord = "s";
+                            break;
+                        case "red":
+                            portStarbord = "p";
+                            break;
+                        default:
+                            break;
+                    }
+                    // console.log(feature.get("name") + "(" + portStarbord + ")")
+                    total = total + " " + feature.get("name") + "(" + portStarbord + ")"
+                    return
+                }
+            });
+
+            return total
+        }
+        /***
+         * Let user change the geometry type.
+         * @param {Event} e Change event.
+         */
+        let optionsForm = document.getElementById('options-form');
+        optionsForm.onchange = function (e) {
+            let type = e.target.getAttribute('name');
+            let value = e.target.value;
+            if (type == 'draw-type') {
+                ExampleDraw.getActive() && ExampleDraw.setActive(true);
+            } else if (type == 'interaction') {
+                if (value == 'modify') {
+                    ExampleDraw.setActive(false);
+                    ExampleModify.setActive(true);
+                } else if (value == 'draw') {
+                    ExampleDraw.setActive(true);
+                    ExampleModify.setActive(false);
+                }
+            }
+        };
+
+        ExampleDraw.setActive(true);
+        ExampleModify.setActive(false);
+
+        // The snap interaction must be added after the Modify and Draw interactions
+        let snap = new Snap({ source: MarkSource });
+        map.addInteraction(snap);
+
+        // Cycle through colour of marks if a mark happens to have been selected
+        map.on('click', function (event) {
+
+            if (document.getElementById("draw").checked) return
+
+
+
+            map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
+                if (!feature) return
+                if (!layer) return
+
+                if (layer.get('id') == "Marks") {
+                    switch (feature.get("markColour")) {
+
+                        case "blue":
+                            feature.set("markColour", "green");
+                            break;
+                        case "green":
+                            feature.set("markColour", "red");
+                            break;
+                        case "red":
+                            feature.set("markColour", "blue");
+                            break;
+                        case "orange":
+                            feature.set("markColour", "green");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (layer.get('id') == "Course") {
+                    //list course in here?
+                    let geom = feature.getGeometry()
+                    let coords = geom.getCoordinates()
+                    let routeCoordsPixel = coords.map(
+                        elem => map.getPixelFromCoordinate(elem)
+
+                    );
+                    let courseTxt = routeCoordsPixel.reduce(ListPortStarboard, "")
+
+                    console.log("Number of points in route :" + routeCoordsPixel.length)
+                    console.log(routeCoordsPixel)
+                    document.getElementById("courseText").innerHTML = "Course :" + courseTxt
+                    ExampleDraw.setActive(false);
+                    ExampleModify.setActive(true);
+                    document.getElementById("draw").checked = false;
+                    //document.getElementById("modify").checked = false;
+                }
+
+
+            });
+        });
+
+    </script>
+</body>
+
+</html>
