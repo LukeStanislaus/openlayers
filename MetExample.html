@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>DataPoint OpenLayers example</title>
+<meta charset="utf-8">
+<style type="text/css">
+#map {
+	height: 600px;
+	width: 600px;
+}
+</style>
+</head>
+<body>
+<h1>DataPoint OpenLayers example</h1>
+<p>Use the map controls to switch the layers off and on</p>
+<div id="map">
+	<noscript>
+	Alternative static content goes here
+	</noscript>
+</div>
+<script src="http://openlayers.org/api/OpenLayers.js" type="text/javascript"></script> 
+<script type="text/javascript">
+/*jslint sloppy: true, browser: true */
+/*global OpenLayers*/
+
+//This example uses the OpenLayers Javascript mapping library
+//for more information see http://www.openlayers.org
+
+//Initialise the openlayers example
+(function () {
+
+	//Use OpenStreetMap as the background maping layer 
+	var map = new OpenLayers.Map('map'),
+		backgroundlayer,
+		bounds,
+		projection,
+		layerSize,
+		satelliteLayer,
+		radarLayer;
+
+	backgroundlayer = new OpenLayers.Layer.OSM("OpenStreetMap"),
+
+	map.addLayer(backgroundlayer);
+	map.addControl(new OpenLayers.Control.LayerSwitcher());
+
+	//Center the Map over the UK
+	map.setCenter(
+		new OpenLayers.LonLat(-3.5, 54.5).transform(
+			new OpenLayers.Projection("EPSG:4326"),
+			map.getProjectionObject()
+		),
+		5
+	);
+
+	//Define the Datapoint layer bounding box
+	// OpenStreetMap is based on a different coordinate system so the Lat and Lon values need to be transformed into the correct projection
+	bounds = new OpenLayers.Bounds();
+	projection = new OpenLayers.Projection("EPSG:4326");
+	bounds.extend(new OpenLayers.LonLat(-12.0, 48.0).transform(projection, map.getProjectionObject()));
+	bounds.extend(new OpenLayers.LonLat(5.0, 61.0).transform(projection, map.getProjectionObject()));
+
+	// Get the Datapoint image
+	layerSize = new OpenLayers.Size(500, 500);
+
+	// Create the layers based on the Datapoint Image URLs, the bounding box and the Image size (500px x 500px)	
+	// The application should first identify the available images by parsing the contents of the capabilities document
+    // for Rainfall Radar this would be the http://datapoint.metoffice.gov.uk/public/data/layer/wxobs/all/xml/capabilities?key=<API key> 
+    //http://datapoint.metoffice.gov.uk/public/data/layer/wxobs/all/datatype/capabilities?key=08e22e90-c663-4e86-a86d-18b8628f24fc
+	// This is a static example image as used in the documentation
+
+	satelliteLayer = new OpenLayers.Layer.Image(
+		"Datapoint Rainfall Observation",
+		"http://datapoint.metoffice.gov.uk/public/data/layer/wxobs/RADAR_UK_Composite_Highres/png?TIME=2020-07-24T11:00:00Z&key=08e22e90-c663-4e86-a86d-18b8628f24fc",
+		bounds,
+		layerSize,
+		{isBaseLayer: false}
+	);
+	radarLayer = new OpenLayers.Layer.Image(
+		"Datapoint SatelliteIR",
+		"http://datapoint.metoffice.gov.uk/public/data/layer/wxobs/SATELLITE_Infrared_Fulldisk/png?TIME=2020-07-24T09:00:00Z&key=08e22e90-c663-4e86-a86d-18b8628f24fc",
+		bounds,
+		layerSize,
+		{isBaseLayer: false}
+	);
+
+	// Add the image layers to the map
+	map.addLayer(satelliteLayer);
+	map.addLayer(radarLayer);
+
+}());
+</script>
+</body>
+</html>
