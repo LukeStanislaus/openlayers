@@ -2,6 +2,11 @@
 
 <head>
     <link rel="stylesheet" type="text/css" href="./libs/v6.3.1-dist/ol.css">
+    
+    <!-- /https://github.com/github/fetch  -->
+    <script src='./libs/promise.min.js'></script>
+    <script src='./libs/fetch.umd.js'></script>
+    
     <script src="./libs/v6.3.1-dist/ol.js"></script>
     <title>OpenLayers Modify</title>
 </head>
@@ -250,6 +255,39 @@
                 zoom: 16
             })
         });
+
+
+const siteListUpdateUISuccess = function(parsedData) {
+  //const parsedData = JSON.parse(data);
+  console.log(parsedData);
+/*   const number = Math.floor(Math.random() * parsedData.data.length);
+  parkName.textContent = parsedData.data[number].fullName;
+  parkName.href = parsedData.data[number].url;
+  parkDesc.textContent = parsedData.data[number].description;
+  parkThumb.src = 'https://www.nps.gov/common/commonspot/templates/assetsCT/images/branding/logo.png';
+  parkSection.classList.remove('hidden'); */
+}
+const siteListUpdateUIError  = function(error) {
+  console.log(error);
+};
+
+const handleErrors = function(response){
+    if(!response.ok){
+        throw(response.status + ': ' + response.statusText);
+    }
+    return response.json();
+}
+
+const url = 'http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/sitelist?key=08e22e90-c663-4e86-a86d-18b8628f24fc'
+//const url = 'http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/sitelist?key=08e22e90-c663-4e86-a86d-18b8628f24'
+const createRequest = function(url,succeed,fail){
+        fetch(url)
+            .then((response)=>handleErrors(response)) //response.json())
+            .then((data)=>{console.log(data)})
+            .catch((error)=>fail(error));
+
+};
+
 
 
 
@@ -508,7 +546,9 @@
 
             });
         });
-
+        window.addEventListener('DOMContentLoaded', () => {
+    createRequest(url,siteListUpdateUISuccess,siteListUpdateUIError);
+})
     </script>
 </body>
 
