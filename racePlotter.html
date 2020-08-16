@@ -1,6 +1,7 @@
 <html>
 
 <head>
+    <link rel="stylesheet" type="text/css" href="./openlayers.css">
     <link rel="stylesheet" type="text/css" href="./libs/v6.3.1-dist/ol.css">
     <script src="./libs/v6.3.1-dist/ol.js"></script>
     <title>OpenLayers Modify</title>
@@ -242,7 +243,15 @@
 
         // Render combined image to browser "map" element
         let map = new Map({
-            interactions: ol.interaction.defaults({ doubleClickZoom: false }),
+            interactions: ol.interaction.defaults({ dragPan: false, mouseWheelZoom: true }).extend([
+                new ol.interaction.DragPan({
+                    condition: function (event) {
+                        return this.getPointerCount() === 2 || ol.events.condition.platformModifierKeyOnly(event);
+                    },
+                }),
+                new ol.interaction.MouseWheelZoom({
+                    condition: ol.events.condition.platformModifierKeyOnly,
+                })]),
             layers: [raster, vector, Marks, vectorLine],
             target: 'map',
             view: new View({
